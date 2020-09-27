@@ -1,0 +1,51 @@
+% layout 'no-sidebar', pagename => $pagename || __('page-title--add-link');
+
+
+% my $formdata = stash('formdata') || {};
+<div class="card card-md">
+  <div class="card-body">
+    <h2 class="mb-5 text-center"> <%= __('page-title--add-link') %></h2>
+    <div id="form--add-link"><form id="form-add-link" method="POST">
+
+%= include 'inc/login-form-maybe'
+
+      <div class="mb-3">
+        <label class="form-label"><%= __('fieldname--link-url') %></label>
+        <input name="url" value="<%= $formdata->{url} %>"
+          placeholder="<%= __('placeholder--link-url') %>"
+          class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><%= __('fieldname--link-title') %></label>
+        <input name="title" value="<%= $formdata->{title} %>"
+          placeholder="<%= __('placeholder--url-title') %>"
+          class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">
+          <%= __('fieldname--url-description') %>
+        </label>
+        <textarea name="description"
+          placeholder="<%= __('placeholder--url-description') %>"
+          class="form-control"><%= $formdata->{description} %></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><%= __('fieldname--url-tags') %></label>
+        <input name="tags" value="<%= $formdata->{tags} %>"
+          placeholder="<%= __('placeholder--url-tags') %>"
+          class="form-control" id="input-url-tags" />
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" id="form-add-link-submit"
+          class="btn btn-primary btn-block">
+          <%= __('button--add-link') %>
+        </button>
+      </div>
+
+    </form></div>
+  </div>
+</div>

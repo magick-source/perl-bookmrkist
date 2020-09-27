@@ -1,0 +1,23 @@
+# Dev version of the basics translations for bookmrkist
+
+# Top Menu
+topmenu-addlink-tooltip     = Add a link to your list
+topmenu-login-tooltip       = Login
+topmenu-not-tracked-tooltip = You're not being tracked - click to enable
+topmenu-hello-user-tooltip  = Hello {$user_name}
+
+# Common link texts
+link-text--login-with-other = Login with other providers
+
+# add links page
+page-title--add-link        = Add a link
+fieldname--link-url         = URL to add
+placeholder--link-url       = https://some-url-to-be-add.com/page.html
+fieldname--link-title       = URL title
+placeholder--url-title      = Type a title for this URL
+fieldname--url-description  = Description of the URL
+placeholder--url-description= Description of the link or why 
+                              it is important for you
+fieldname--url-tags         = Tags
+placeholder--url-tags       = comma, separated, tags
+button--add-link            = Add link

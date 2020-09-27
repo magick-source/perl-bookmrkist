@@ -1,0 +1,7 @@
+this is the <b>default</b> layout in the bookmrkist theme
+<br/><br/>
+<div style="color:blue"> content:
+<%= content %>
+</div>
+<br/>
+And this is the footer in the theme

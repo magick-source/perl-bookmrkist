@@ -1,0 +1,4 @@
+% layout 'with-sidebar', sidebar_left => 1, title => $pagename || 'List';
+
+Just list that goes here!!
+

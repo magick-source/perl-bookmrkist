@@ -1,0 +1,10 @@
+% layout 'with-sidebar', sidebar_left=> 1, page_title => 'Index';
+
+% my $user = user();
+% if (!$user or $user->is_anonymous()) {
+<a href="/login">Login</a>
+% } else {
+<p>Welcome, <%= $user->display_name || $user->username %> !</p>
+
+<p> <a href="/logout/">Logout</a> </p>
+% }
