@@ -34,12 +34,14 @@ sub vote_score {
 
 #TODO(maybe): Make the scores for each right configurabl
 my %role_scores  = (
+  badboy    =>   -100,
   newbie    =>      0,
   linker    =>    100,
   moderator =>  1_000,
   manager   => 10_000,
 );
 my %rights  = (
+  add_links       => 'badboy',
   vote_for        => 'newbie',
   report_adult    => 'linker',
   vote_against    => 'linker',

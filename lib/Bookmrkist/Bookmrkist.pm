@@ -31,7 +31,7 @@ sub register {
 
   $r->route('/add')->to('Bookmarks#add_page');
 
-  my $user_api = $r->api_can('');
+  my $user_api = $r->api_can('add_links');
   $user_api->route('/add-link')->to('BookmarksAPI#add_link');
 
   # to make multi-site work
