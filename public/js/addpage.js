@@ -25,7 +25,7 @@ $(document).ready(function () {
     
       var formdata = $(this).serialize();
 
-      $.post(sitevars.apibase + '/add-link', function (data) {
+      $.post(sitevars.apibase + '/add-link', formdata, function (data) {
           console.log( data );
           
         }).fail( function( jqXHR, error, errorThrown ) {

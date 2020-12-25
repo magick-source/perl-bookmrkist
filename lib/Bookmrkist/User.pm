@@ -53,8 +53,16 @@ my %rights  = (
   flag_adult_user => 'manager',
 );
 
+my %anonymous_rights = map { $_ => 1 } qw(
+    vote_for
+  );
+
 sub _user_has_right {
   my ($next, $c, $user, $right) = @_;
+
+  if ( $user->anonymous ) {
+    return $anonymous_rights{ $right } || 0;
+  }
 
   my $user_score = user_score( $user );
   return 1 if $right eq 'spammer' and $user_score < 0;

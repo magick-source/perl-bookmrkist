@@ -100,13 +100,4 @@ sub _html_body_end {
   return $res;
 }
 
-sub _root {
-  my ($c, @other) = @_;
-
-  use Data::Dumper;
-  print STDERR "_root: ", Dumper(\@other);
-
-  return $c->render(template => 'index');
-}
-
 1;

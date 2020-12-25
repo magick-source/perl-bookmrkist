@@ -6,6 +6,7 @@
   <div class="card-body">
     <h2 class="mb-5 text-center"> <%= __('page-title--add-link') %></h2>
     <div id="form--add-link"><form id="form-add-link" method="POST">
+      <input type="hidden" name="csrf_token" value="<%= csrf_token() %>" />
 
 %= include 'inc/login-form-maybe'
 

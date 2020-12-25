@@ -1,4 +1,4 @@
-% layout 'with-sidebar', sidebar_left=> 1, page_title => 'Index';
+% layout 'with-sidebar', sidebar_left => 1, page_title => 'Index';
 
 % my $user = user();
 % if (!$user or $user->is_anonymous()) {

@@ -1,4 +1,4 @@
-% layout 'with-sidebar', sidebar_left => 1, title => $pagename || 'List';
+% layout 'with-sidebar', sidebar_left => 0, title => $pagename || 'List';
 
 Just list that goes here!!
 
