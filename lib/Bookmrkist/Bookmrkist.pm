@@ -37,7 +37,8 @@ sub register {
   # to make multi-site work
   $app->hook(around_action  => sub { $self->_around_action( @_ ) });
 
-  $app->html_hook(html_body_end  => sub { $self->_html_body_end( @_ ) });
+  $app->helper( needed_js => \&_needed_js );
+  $app->html_hook(html_body_end  => \&_html_body_end );
 
   return $self;
 }
@@ -83,8 +84,18 @@ sub _around_action {
   return $next->();
 }
 
+sub _needed_js {
+  my ($c, @paths) = @_;
+
+  for my $js_path ( @paths ) {
+    $c->stash->{needed_js}->{ $js_path } = undef;
+  }
+
+  return;
+}
+
 sub _html_body_end {
-  my ($app, $c, @params) = @_;
+  my ($c, @params) = @_;
 
   my $res = '';
   if (my $needed = $c->stash->{needed_js}) {
@@ -94,8 +105,6 @@ sub _html_body_end {
       $res .= "<script src='$js'></script>\n";
     }
   }
-
-  print STDERR "bookmrkist body_end: $res\n";
 
   return $res;
 }

@@ -19,7 +19,7 @@ sub add_page {
   my ($c) = @_;
 
   $c->stash->{pagename} = $c->__('page-title--add-link');
-  $c->stash->{needed_js}->{addpage} = undef;
+  $c->needed_js('bookmarks/api', 'bookmarks/addpage');
 
   my $formdata = $c->stash->{formdata} ||= {};
   for my $param (qw(url title description tags)) {

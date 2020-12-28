@@ -33,19 +33,14 @@ print STDERR "input: ", Dumper( $input );
   $v->csrf_protect()
     unless $c->stash->{oathed};
 
-  if ( $v->has_error() ) {
-    my %errors = map { $_ => $v->error( $_ ) } @{ $v->failed };
-    
-    use Data::Dumper;
-    print STDERR "errors: ", Dumper(\%errors);
-
-    return $c->api_fail( 400 => { errors => \%errors });
-  }
+  return $c->handle_input_errors( $v, api_errors => 1 )
+    if $v->has_error();
 
   my $data = $v->output();
 
-  
-
+  # TODO: Find or insert the URL
+  # TODO: add the user_url object
+  # TODO: return url of the new link
   use Data::Dumper;
   print STDERR "data: ", Dumper( $data );
 

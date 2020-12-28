@@ -20,30 +20,19 @@ $(document).ready(function () {
 
   // Submit the add form as ajax
   $('#form-add-link').submit(function ( event ) {
+      // most likely I'll refactor this to have an api file
+      // and move all the object handling to the theme specific
+      // files
       $('#form-add-link-submit').attr("disabled", true);
       $('#form-add-link-submit-loader').show;
     
-      var formdata = $(this).serialize();
+      $('#form--add-link .form-control')
+        .removeClass('is-invalid');
 
-      $.post(sitevars.apibase + '/add-link', formdata, function (data) {
-          console.log( data );
-          
-        }).fail( function( jqXHR, error, errorThrown ) {
-          var errorobj = {};
-          if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
-            errorobj = jqXHR.responseJSON.error;
-          } else {
-            errorobj = {
-                'type': 'fatal',
-                'message': errorThrown
-              };
-          }
-          console.log( 'post failed!' );
-          console.log( errorobj );
-
-        }).always( function() {
+      $Bk.add_link( this ).always(function () {
           $('#form-add-link-submit').attr("disabled", false);
           $('#form-add-link-submit-loader').hide;
+          console.log('Got here!!');
         });
 
       event.preventDefault();

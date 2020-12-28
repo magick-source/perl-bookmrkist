@@ -1,6 +1,6 @@
 % layout 'no-sidebar', pagename => $pagename || __('page-title--add-link');
 
-
+% needed_js 'bookmarks/handle_errors';
 % my $formdata = stash('formdata') || {};
 <div class="card card-md">
   <div class="card-body">
@@ -10,21 +10,21 @@
 
 %= include 'inc/login-form-maybe'
 
-      <div class="mb-3">
+      <div class="mb-3 form-group">
         <label class="form-label"><%= __('fieldname--link-url') %></label>
         <input name="url" value="<%= $formdata->{url} %>"
           placeholder="<%= __('placeholder--link-url') %>"
           class="form-control" />
       </div>
 
-      <div class="mb-3">
+      <div class="mb-3 form-group">
         <label class="form-label"><%= __('fieldname--link-title') %></label>
         <input name="title" value="<%= $formdata->{title} %>"
           placeholder="<%= __('placeholder--url-title') %>"
           class="form-control" />
       </div>
 
-      <div class="mb-3">
+      <div class="mb-3 form-group">
         <label class="form-label">
           <%= __('fieldname--url-description') %>
         </label>
@@ -33,7 +33,7 @@
           class="form-control"><%= $formdata->{description} %></textarea>
       </div>
 
-      <div class="mb-3">
+      <div class="mb-3 form-group">
         <label class="form-label"><%= __('fieldname--url-tags') %></label>
         <input name="tags" value="<%= $formdata->{tags} %>"
           placeholder="<%= __('placeholder--url-tags') %>"
