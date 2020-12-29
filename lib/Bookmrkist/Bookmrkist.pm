@@ -4,6 +4,7 @@ use Mojo::Base qw(Mojolicious::Plugin);
 
 use Bookmrkist::Db;
 use Bookmrkist::User;
+use Bookmrkist::Scoring;
 
 has _current_config => 'xxx';
 has 'app';
@@ -16,6 +17,7 @@ sub register {
   $self->shared_users(1) if ($conf->{shared_users});
 
   Bookmrkist::User->register( $app );
+  Bookmrkist::Scoring->register( $app );
 
   # Routes and stuff 
   my $r = $app->routes;

@@ -27,9 +27,12 @@ sub user_score {
 }
 
 sub vote_score {
-  use Data::Dumper;
-  print STDERR 'vote_score: ', Dumper(\@_);
+  my ($user) = @_;
 
+  my $vote = 1;
+  $vote = 0 if $user->score <= 0;
+
+  return $vote;
 }
 
 #TODO(maybe): Make the scores for each right configurabl
