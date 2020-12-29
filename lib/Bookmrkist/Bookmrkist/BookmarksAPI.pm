@@ -3,7 +3,8 @@ package Bookmrkist::Bookmrkist::BookmarksAPI;
 use Mojo::Base qw(Mojolicious::Controller);
 
 use Bookmrkist::Validator;
-
+use Bookmrkist::Db::Url;
+use Bookmrkist::Db::Bookmark;
 
 sub add_link {
   my ($c) = @_;
@@ -17,9 +18,6 @@ sub add_link {
     tags        => $c->param('tags'),
     csrf_token  => $c->param('csrf_token'),
   };
-
-use Data::Dumper;
-print STDERR "input: ", Dumper( $input );
 
   $v->input( $input );
 
@@ -38,22 +36,37 @@ print STDERR "input: ", Dumper( $input );
 
   my $data = $v->output();
 
-  # TODO: Find or insert the URL
-  # TODO: add the user_url object
-  # TODO: return url of the new link
-  use Data::Dumper;
-  print STDERR "data: ", Dumper( $data );
+  my ($url) = Bookmrkist::Db::Url->find_or_create( $data->{url} );
 
-  return $c->render(json => { done => 0 });
-}
+  my ($bookmark) = Bookmrkist::Db::Bookmark->find_or_create({
+      url_uuid  => $url->uuid,
+      title     => $data->{title},
+      comment   => $data->{description},
+      user_id   => $c->user->user_id,
+    });
 
-sub __finish_with_error { 
-  my ($c) = @_;
+  my %res;
+  if ( $bookmark ) {
+    %res = (
+        done    => 1,
+        objects => {
+          url       => $c->url_for('/url/'.$url->link_hash)->to_abs,
+          bookmark  => $c->url_for('/bookmark/'.$bookmark->link_hash)->to_abs,
+        },
+      );
 
-  return unless $c->res->code() == 200;
+  } else {
+    $c->res->code(500);
+    %res = (
+        done    => 0,
+        errors  => [{
+          type => 'unknow',
+          message => $c->translate('error_unknow_no_db_object'),
+        }],
+      );
+  }
 
-  $c->res->code(400);
-  $c->render(json => { errors => $c->flash('errors') });
+  return $c->render(json => \%res);
 }
 
 1;

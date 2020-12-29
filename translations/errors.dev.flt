@@ -1,0 +1,4 @@
+# dev version of the translation of error messages for bookmrkist
+
+error_unknow_no_db_object = Unknow error - no objects returned from db
+

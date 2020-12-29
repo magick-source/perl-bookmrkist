@@ -8,3 +8,4 @@ $(document).on('handle-input-field-error', function (event, err) {
 
   console.log({'on': 'error-handler', 'event': event, 'err': err });
 });
+

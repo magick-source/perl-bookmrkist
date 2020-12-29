@@ -29,7 +29,13 @@ $(document).ready(function () {
       $('#form--add-link .form-control')
         .removeClass('is-invalid');
 
-      $Bk.add_link( this ).always(function () {
+      $Bk.add_link( this ).done(function (data) {
+          var added_event = $.Event('bookmark-added');
+          $(document).trigger( added_event );
+          if ( ! added_event.isDefaultPrevented() )
+            window.location.assign( data.objects.bookmark );
+
+        }).always(function () {
           $('#form-add-link-submit').attr("disabled", false);
           $('#form-add-link-submit-loader').hide;
           console.log('Got here!!');
