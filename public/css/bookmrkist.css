@@ -1,0 +1,6 @@
+.text-white a {
+  color: #eee;
+}
+.text-white a:hover {
+  color: #fff;
+}

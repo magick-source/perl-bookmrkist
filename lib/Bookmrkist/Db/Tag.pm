@@ -18,6 +18,21 @@ __PACKAGE__->columns(Columns => qw(
     flags
   ));
 
+__PACKAGE__->set_sql(top_tags => <<EoQ);
+SELECT * FROM __TABLE__ WHERE id in (
+  SELECT tag_id FROM (
+    SELECT tag_id, count(bookmark_uuid) c
+      FROM bookmark b
+        LEFT JOIN bookmark_tag bt
+          ON b.uuid = bt.bookmark_uuid
+      WHERE b.url_uuid = ?
+      GROUP by tag_id
+      ORDER by c DESC
+      LIMIT 5
+  ) btc
+)
+EoQ
+
 sub find_or_create {
   my ($class, $tag) = @_;
 
@@ -51,6 +66,12 @@ sub find_or_create_many {
   }
 
   return @recs;
+}
+
+sub top_tags_for_url {
+  my ($class, $url_uuid) = @_;
+
+  return $class->search_top_tags( $url_uuid );
 }
 
 1;

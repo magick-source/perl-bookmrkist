@@ -5,7 +5,6 @@ use parent 'Bookmrkist::Db';
 use SorWeTo::Utils::Digests qw(
   generate_random_hash
   hash2uuid
-  link_hash
 );
 
 __PACKAGE__->table('url');

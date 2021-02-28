@@ -45,23 +45,26 @@ my %role_scores  = (
 );
 my %rights  = (
   add_links       => 'badboy',
-  vote_for        => 'newbie',
   report_adult    => 'linker',
-  vote_against    => 'linker',
   select_min_list => 'linker',
-  boost_url       => 'moderator',
   report_spam     => 'moderator',
   flag_spam       => 'manager',
   flag_adult      => 'manager',
   flag_adult_user => 'manager',
+
+  vote_like       => 'newbie',
+  vote_dislike    => 'linker',
+  vote_love       => 'moderator',
+  vote_hate       => 'moderator',
+  vote_spam       => 'manager',
 );
 
 my %anonymous_rights = map { $_ => 1 } qw(
-    vote_for
+    vote_like
   );
 
 sub _user_has_right {
-  my ($next, $c, $user, $right) = @_;
+  my ($next, $user, $right) = @_;
 
   if ( $user->anonymous ) {
     return $anonymous_rights{ $right } || 0;
@@ -81,7 +84,7 @@ sub _user_has_right {
     return 0;
   }
 
-  return $next->( $c, $user, $user ) if $next;
+  return $next->( $user, $user ) if $next;
 
   return;
 }

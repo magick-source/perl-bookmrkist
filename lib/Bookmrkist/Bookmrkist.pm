@@ -23,24 +23,30 @@ sub register {
   my $r = $app->routes;
   unshift @{$r->namespaces}, 'Bookmrkist::Bookmrkist';
 
-  $r->route('/')->to('Bookmarks#list');
-  $r->route('/tag/:tag'=> [tag  => qr/\w[\w\-]{2,}\w/])->to('Bookmarks#list');
-  $r->route('/u/:user' => [user => qr/\w{3,}/]        )->to('Bookmarks#list');
-  $r->route('/u/:user/:tag'
+  $r->any('/')->to('Bookmarks#list');
+  $r->any('/tag/:tag'=> [tag  => qr/\w[\w\-]{2,}\w/])->to('Bookmarks#list');
+  $r->any('/u/:user' => [user => qr/\w{3,}/]        )->to('Bookmarks#list');
+  $r->any('/u/:user/:tag'
           => [ user => qr/\w{3,}/,
                tag  => qr/\w[\w-]{2,}\w/,
              ])->to('Bookmarks#list');
 
-  $r->route('/add')->to('Bookmarks#add_page');
+  $r->any('/add')->to('Bookmarks#add_page');
+
+  $r->get('/url/:link_hash'
+            => [link_hash => qr/[0-9a-z]{30}/
+               ])->to('Bookmarks#view');
 
   my $user_api = $r->api_can('add_links');
-  $user_api->route('/add-link')->to('BookmarksAPI#add_link');
+  $user_api->any('/add-link')->to('BookmarksAPI#add_link');
 
   # to make multi-site work
   $app->hook(around_action  => sub { $self->_around_action( @_ ) });
 
-  $app->helper( needed_js => \&_needed_js );
-  $app->html_hook(html_body_end  => \&_html_body_end );
+  $app->helper( needed_js   => \&_needed_js );
+  $app->helper( needed_css  => \&_needed_css );
+  $app->html_hook(html_body_end => \&_html_body_end );
+  $app->html_hook(html_head     => \&_html_head );
 
   return $self;
 }
@@ -96,6 +102,16 @@ sub _needed_js {
   return;
 }
 
+sub _needed_css {
+  my ($c, @paths) = @_;
+
+  for my $js_path ( @paths ) {
+    $c->stash->{needed_css}->{ $js_path } = undef;
+  }
+
+  return;
+}
+
 sub _html_body_end {
   my ($c, @params) = @_;
 
@@ -107,6 +123,22 @@ sub _html_body_end {
       $res .= "<script src='$js'></script>\n";
     }
   }
+
+  return $res;
+}
+
+sub _html_head {
+  my ($c, @params) = @_;
+
+  my $res = '';
+  if (my $needed = $c->stash->{needed_css}) {
+    for my $css (keys %{ $needed }) {
+      $css = "/css/$css" unless $css =~ m{\A/};
+      $css .= '.css' unless $css =~ m{\.\w{3,}\z};
+      $res .= "<link href='$css' rel='stylesheet' type='text/css' />\n";
+    }
+  }
+
 
   return $res;
 }

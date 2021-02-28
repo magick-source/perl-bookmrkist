@@ -5,7 +5,7 @@ use parent 'Bookmrkist::Db';
 use SorWeTo::Utils::Digests qw(
   generate_random_hash
   hash2uuid
-  link_hash
+  uuid2hash
 );
 
 __PACKAGE__->table('bookmark');
@@ -23,6 +23,14 @@ __PACKAGE__->columns(Columns => qw(
     last_updated
     added
   ));
+
+__PACKAGE__->set_sql( count_for_url => <<EoQ);
+SELECT COUNT(uuid)
+  FROM __TABLE__
+  WHERE url_uuid = ?
+    AND NOT find_in_set('private', flags)
+    AND find_in_set('active', flags)
+EoQ
 
 sub find_or_create {
   my ($class, $bookmark) = @_;
@@ -43,6 +51,22 @@ sub find_or_create {
   }
 
   return $rec;
+}
+
+sub link_hash {
+  my ($self) = @_;
+
+  return uuid2hash( $self->uuid );
+}
+
+sub count_for_url {
+  my ($class, $url_uuid) = @_;
+
+  my $count = $class->sql_count_for_url()->select_val( $url_uuid );
+  
+  print STDERR "count_for_url [$url_uuid]: $count\n";
+
+  return $count;
 }
 
 1;

@@ -55,11 +55,20 @@ sub add_link {
 
   my %res;
   if ( $bookmark ) {
+    $url = Bookmrkist::Data::Url->new( db_obj => $url, user => $c->user );
+    $bookmark = Bookmrkist::Data::Bookmark->new(
+          db_obj => $bookmark,
+          url => $url,
+          user => $c->user
+        );
+
+    my $ulink = $c->url_for($url->link)->to_abs;
+    my $blink  = $c->url_for($bookmark->link)->to_abs;
     %res = (
         done    => 1,
         objects => {
-          url       => $c->url_for('/url/'.$url->link_hash)->to_abs,
-          bookmark  => $c->url_for('/bookmark/'.$bookmark->link_hash)->to_abs,
+          url       => $ulink,
+          bookmark  => $blink,
         },
       );
 

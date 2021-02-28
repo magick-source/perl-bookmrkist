@@ -1,4 +1,12 @@
 % layout 'with-sidebar', sidebar_left => 0, title => $pagename || 'List';
 
-Just list that goes here!!
+<h2>Bookmarks</h2>
+
+% my $urls = stash('urls') || [];
+% for my $url ( @$urls ) {
+
+%= include 'bookmark/inc/url-main', url => $url, on_list => 1;
+
+% }
+
 

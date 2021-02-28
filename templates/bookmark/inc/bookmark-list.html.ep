@@ -1,0 +1,55 @@
+% needed_css('bookmrkist.css');
+<div class="row row-cards justify-content-center">
+  <div class="col-10">
+    <h3>Comments</h3>
+% for my $book (@{ $url->bookmarks }) {
+    <div class="card">
+% if ( $book->highlight ) {
+      <div class="card-status-left bg-primary"></div>
+% }
+      <div class="card-body">
+        <div class="row row-cards">
+          <div class="col-auto">
+% my $user = $book->user; my $color = $user->icon_color || 'bg-blue';
+            <span class="avatar avatar-lg rounded <%= $color %>">
+% unless ( $user->is_anonymous ) {
+              <a href="<%= url_for( $user->link ) %>" >
+% }
+                <i  class="<%= $user->icon %>"
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="<%= $user->display_name %>"></i>
+% unless ( $user->is_anonymous ) {
+            </a>
+% } 
+            </span>
+          </div>
+          <div class="col">
+            <h3 class="card-title"><%= $book->title %></h3>
+            <p><%= $book->comment %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row align-items-center">
+          <div class="col-auto">
+% for my $tag (@{ $book->tags }) {
+            <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->display_name %></a>
+% }
+          </div>
+          <div class="col-auto ml-auto">
+            <ul class="nav nav-pills">
+%   for my $icon (@{ $book->vote->icons} ) {
+              <li class="nav-item <%= $icon->color %>">
+                <i class="<%= $icon->icon %>" ></i>
+              </li>
+%   }
+            </ul>
+          </div>
+        </div>
+      </div>
+% }
+    </div>
+  </div>
+</div>
+
+

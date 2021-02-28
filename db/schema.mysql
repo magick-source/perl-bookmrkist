@@ -1,0 +1,62 @@
+-- TODO: create automatically from loaded packages
+
+CREATE TABLE `bookmark` (
+  `uuid` char(60) NOT NULL,
+  `url_uuid` char(36) DEFAULT NULL,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `title` varchar(100) DEFAULT NULL,
+  `comment` text DEFAULT NULL,
+  `score` decimal(6,2) DEFAULT NULL,
+  `flags` set('active','spam','adult','private') DEFAULT NULL,
+  `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `added` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`uuid`),
+  UNIQUE KEY `url_uuid` (`url_uuid`,`user_id`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `url` (
+  `uuid` char(36) NOT NULL,
+  `domain` varchar(50) DEFAULT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `icon` varchar(100) DEFAULT NULL,
+  `shoot` varchar(100) DEFAULT NULL,
+  `page_title` varchar(100) DEFAULT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `flags` set('active','pending','adult','spam') DEFAULT NULL,
+  `base_score` decimal(5,2) DEFAULT NULL,
+  `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`uuid`),
+  KEY `domain` (`domain`,`url`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `tag` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `url` varchar(50) DEFAULT NULL,
+  `display_name` varchar(50) DEFAULT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `flags` set('spam','adult') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `url` (`url`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `bookmark_tag` (
+  `bookmark_uuid` char(36) NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL,
+  `bookmark_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `bookmark_score` decimal(5,2) DEFAULT NULL,
+  `bookmark_flags` set('adult','private') DEFAULT NULL,
+  PRIMARY KEY (`bookmark_uuid`,`tag_id`),
+  KEY `tag_id` (`tag_id`,`bookmark_time`,`bookmark_flags`),
+  KEY `tag_id_2` (`tag_id`,`bookmark_score`,`bookmark_flags`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `bookmark_vote` (
+  `bookmark_uuid` char(36) NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `vote_type` enum('love','like','dislike','hate','spam') DEFAULT NULL,
+  `score` decimal(2,2) DEFAULT NULL,
+  `voted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `flags` set('active') DEFAULT NULL,
+  PRIMARY KEY (`bookmark_uuid`,`user_id`),
+  KEY `user_id` (`user_id`,`voted_at`)
+) ENGINE=InnoDB;

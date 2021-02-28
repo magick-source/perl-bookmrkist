@@ -1,0 +1,44 @@
+% my $title = $url->page_title;
+% unless ( $title ) {
+%   if ( my $bmrk = $url->bookmarks->[0] ) {
+%     $title = $bmrk->title;
+%   } else { $title = 'untitled' }
+% }
+<div class="row row-cards"><div class="col-12">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="card-title">
+% if ( $on_list ) {
+        <a href="<%= $url->link %>">
+% }
+          <%= $title %>
+% if ( $on_list ) {
+        </a>
+% }
+      </h2>
+      <div class="card-subtitle">
+        <a href="<%= $url->go_link %>"><%= $url->url %></a>
+      </div>
+% if ($url->description) {
+      <p><%= $url->description %></p>
+% }
+    </div>
+    <div class="card-footer">
+      <div class="row align-items-center">
+        <div class="col-auto">
+% for my $tag (@{ $url->top_tags }) {
+          <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->display_name %></a>
+% }
+        </div>
+        <div class="col-auto ml-auto">
+          <ul class="nav nav-pills">
+            <li class="nav-item text-primary">
+              <i class="far fa-user"></i> <%= $url->count_bookmarks %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
