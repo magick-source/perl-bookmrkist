@@ -50,6 +50,35 @@ CREATE TABLE `bookmark_tag` (
   KEY `tag_id_2` (`tag_id`,`bookmark_score`,`bookmark_flags`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE `url_tag` (
+  `url_uuid` char(36) NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL,
+  `first_bookmark_time` timestamp NOT NULL DEFAULT '1970-01-01 12:59:59',
+  `last_bookmark_time` timestamp NOT NULL DEFAULT '1970-01-01 12:59:59',
+  `public_bookmarks` smallint(5) unsigned DEFAULT NULL,
+  `total_score` decimal(7,2) DEFAULT NULL,
+  `max_score` decimal(6,2) DEFAULT NULL,
+  `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`url_uuid`,`tag_id`),
+  KEY `first_bookmark_time` (`first_bookmark_time`,`total_score`),
+  KEY `last_bookmark_time` (`last_bookmark_time`,`max_score`),
+  KEY `max_score` (`max_score`,`first_bookmark_time`),
+  KEY `total_score` (`total_score`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `tag_count` (
+  `tag_id` int(10) unsigned NOT NULL,
+  `first_bookmark_time` timestamp NOT NULL DEFAULT '1970-01-01 12:59:59',
+  `public_bookmarks` mediumint(9) DEFAULT NULL,
+  `total_score` decimal(9,2) DEFAULT NULL,
+  `max_score` decimal(6,2) DEFAULT NULL,
+  PRIMARY KEY (`tag_id`),
+  KEY `first_bookmark_time` (`first_bookmark_time`),
+  KEY `total_score` (`total_score`,`public_bookmarks`),
+  KEY `max_score` (`max_score`,`public_bookmarks`),
+  KEY `public_bookmarks` (`public_bookmarks`)
+) ENGINE=InnoDB;
+
 CREATE TABLE `bookmark_vote` (
   `bookmark_uuid` char(36) NOT NULL,
   `user_id` int(10) unsigned NOT NULL,

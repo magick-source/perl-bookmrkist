@@ -11,7 +11,16 @@ sub list {
   my $stash = $c->stash;
   $stash->{pagename} = "List Bookmarks";
 
-  my @url = Bookmrkist::Data::Url->search();
+  my %filters = ();
+
+  if ( $stash->{tag} ) {
+    $filters{ tag } = $stash->{tag };
+  }
+  if ( $stash->{ username }) {
+    $filters{ username } = $stash->{username}; 
+  }
+
+  my @url = Bookmrkist::Data::Url->search( %filters );
 
   $stash->{urls} = \@url;
 

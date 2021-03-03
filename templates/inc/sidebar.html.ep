@@ -1,0 +1,24 @@
+% my $sideclass = stash('sidebar_left') ? 'navbar-left' : 'navbar-right';
+
+<aside class="navbar navbar-vertical <%= $sideclass %> navbar-expand-lg navbar-light">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-sidebar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-sidebar">
+      <div class="row row-cards">
+        <div class="card">
+          <div class="card-header">
+            Top Tags
+          </div>
+          <div class="card-body">
+% my @tags = global_top_tags();
+% for my $tag ( @tags ) {
+            <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->label %></a>
+% }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>

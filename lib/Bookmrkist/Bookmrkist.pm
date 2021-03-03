@@ -24,11 +24,12 @@ sub register {
   unshift @{$r->namespaces}, 'Bookmrkist::Bookmrkist';
 
   $r->any('/')->to('Bookmarks#list');
+  # TODO: $r->any('/recent')->to('Bookmarks#list', recent => 1);
   $r->any('/tag/:tag'=> [tag  => qr/\w[\w\-]{2,}\w/])->to('Bookmarks#list');
-  $r->any('/u/:user' => [user => qr/\w{3,}/]        )->to('Bookmarks#list');
-  $r->any('/u/:user/:tag'
-          => [ user => qr/\w{3,}/,
-               tag  => qr/\w[\w-]{2,}\w/,
+  $r->any('/user/:username' => [username => qr/\w{3,}/])->to('Bookmarks#list');
+  $r->any('/user/:username/:tag'
+          => [ username => qr/\w{3,}/,
+               tag      => qr/\w[\w-]{2,}\w/,
              ])->to('Bookmarks#list');
 
   $r->any('/add')->to('Bookmarks#add_page');
@@ -45,6 +46,7 @@ sub register {
 
   $app->helper( needed_js   => \&_needed_js );
   $app->helper( needed_css  => \&_needed_css );
+  $app->helper( global_top_tags => \&_global_top_tags );
   $app->html_hook(html_body_end => \&_html_body_end );
   $app->html_hook(html_head     => \&_html_head );
 
@@ -110,6 +112,12 @@ sub _needed_css {
   }
 
   return;
+}
+
+sub _global_top_tags {
+  my ($c) = @_;
+
+  return Bookmrkist::Data::Tag->global_top_tags();
 }
 
 sub _html_body_end {

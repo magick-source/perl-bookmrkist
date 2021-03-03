@@ -3,9 +3,12 @@ package Bookmrkist::Data::Url;
 use Mojo::Base 'Bookmrkist::Data::Base';
 
 use Bookmrkist::Db::Url;
+use Bookmrkist::Db::UrlTag;
 
 use Bookmrkist::Data::Bookmark;
 use Bookmrkist::Data::Tag;
+
+use SorWeTo::Db::User;
 
 use SorWeTo::Utils::Digests qw(
     hash2uuid
@@ -48,25 +51,86 @@ sub retrieve {
   return $self;
 }
 
+my %orders = (
+    score   => 'base_score desc',
+    b_score => 'score desc, added asc',
+    t_score => 'max_score desc, first_bookmark_time asc',
+  );
 sub search {
   my ($class, %filters) = @_;
+
+  my $tag       = delete $filters{ tag };
+  my $username  = delete $filters{ username };
+
+  my $count     = delete $filters{page_size} || 13;
+  $count = 15 if $count < 1 or $count > 50;
+
+  my $page      = delete $filters{page} || 1;
+  my $offset    = ($page - 1) * $count;
+
+  my $order     = delete $filters{ order } || 'score';
+  $order = 'score' unless $orders{ $order };
+
+  if ($username) {
+    my ($user) = SorWeTo::Db::User->search_where( username => $username );
+    return unless $user;
+
+    $filters{'b.user_id'} = $user->user_id;
+
+    $order  = "b_$order";
+  }
+  
+  if ( $tag ) {
+    my ($otag) = Bookmrkist::Db::Tag->search_where(url  => $tag);
+    return unless $otag;
+
+    $filters{ 'bt.tag_id' } = $otag->id;
+
+    $order  = "t_$order" unless $username;
+  }
  
-  unless ( $filters{ flags } ) {
-    $filters{ flags} = { -and => {
+  my %extra = (
+      limit_dialect => 'LimitOffset',
+      limit         => $count,
+      offset        => $offset,
+      order_by      => $orders{ $order },
+    );
+
+
+  my @urls;
+  if ( $username ) {
+    my @url_ids = Bookmrkist::Db::Bookmark->search_where({
+        user_id => delete $filters{'b.user_id'},
+        %filters,
+      }, \%extra);
+    @url_ids = map { $_->url_uuid } @url_ids;
+
+    @urls = Bookmrkist::Db::Url->search_where( uuid => \@url_ids ) ;
+
+  } elsif ( $tag ) {
+    my @url_ids = Bookmrkist::Db::UrlTag->search_where({
+          tag_id => $filters{'bt.tag_id'}
+        }, \%extra );
+    return unless @url_ids;
+
+    @url_ids = map { $_->url_uuid } @url_ids;
+    @urls = Bookmrkist::Db::Url->search_where(uuid => \@url_ids);
+
+  } else {
+    unless ( $filters{ flags } ) {
+      $filters{ flags} = { -and => {
                             -like => "%active%" ,
                             -not_like => "%private%"
                             }
                         };
+    }
+    @urls = Bookmrkist::Db::Url->search_where( \%filters, \%extra );
+
   }
 
-  my @url = Bookmrkist::Db::Url->search_where( \%filters );
+  @urls = map { $class->new( db_obj => $_ ) } @urls;
 
-  @url = map { $class->new( db_obj => $_ ) } @url;
-
-use Data::Dumper;
-print STDERR 'urls: ', Dumper(\@url);
-
-  return @url;
+  return @urls;
 }
 
 sub link {
@@ -87,7 +151,6 @@ sub count_bookmarks {
   my $count = Bookmrkist::Db::Bookmark->count_for_url( $self->uuid );
   
   my $uuid = $self->uuid;
-  print STDERR "counting bookmarks for '$uuid': $count\n";
 
   return $count;
 }
@@ -95,7 +158,27 @@ sub count_bookmarks {
 sub top_tags {
   my ($self) = @_;
 
-  return [ Bookmrkist::Data::Tag->top_tags_for_url( $self->uuid ) ];
+  my $sth = Bookmrkist::Db::BookmarkTag->top_tags(
+                    url_uuid => $self->uuid
+                  );
+
+  my %tagcounts = ();
+  $sth->bind_columns( \my ($id, $count) );
+  while ( $sth->fetch() ) {
+    $tagcounts{ $id } = $count;
+  }
+
+  my @tags = Bookmrkist::Data::Tag->search(
+      id  => [ keys %tagcounts ],
+    );
+
+  for my $tag ( @tags ) {
+    $tag->count( $tagcounts{ $tag->id } );
+  }
+
+  @tags = sort { ($b->count <=> $a->count) || ($b->url cmp $a->url) } @tags;
+
+  return \@tags;
 }
 
 sub _load_bookmarks {

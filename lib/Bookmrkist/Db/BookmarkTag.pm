@@ -15,6 +15,25 @@ __PACKAGE__->columns(Columns => qw(
   ));
 
 
+__PACKAGE__->set_sql(top_tags_for_url => <<EoQ);
+SELECT tag_id, count(bookmark_uuid) c
+  FROM bookmark b
+    LEFT JOIN bookmark_tag bt
+      ON b.uuid = bt.bookmark_uuid
+  WHERE b.url_uuid = ?
+  GROUP by tag_id
+  ORDER by c DESC
+  LIMIT %s
+EoQ
+
+__PACKAGE__->set_sql(top_tags => <<EoQ);
+SELECT tag_id, count(bookmark_uuid) c
+  FROM __TABLE__
+  GROUP by tag_id
+  ORDER by c DESC
+  LIMIT %s
+EoQ
+
 sub update_links {
   my ($class, $bookmark, $tags) = @_;
 
@@ -58,6 +77,32 @@ sub update_links {
   }
 
   return @links;
+}
+
+sub top_tags {
+  my ($class, %params) = @_;
+
+  my $url = delete $params{url_uuid};
+
+  my $paging;
+  my ($page) = delete $params{ page } || 1;
+  my ($count) = delete $params{ count };
+  unless ($count) {
+    $count = $url ? 5 : 25;
+  }
+  my $first = ($page-1) * $count;
+  $paging = "$first,$count";
+
+  my $sth;
+  if ( $url ) {
+    $sth = $class->sql_top_tags_for_url( $paging );
+    $sth->execute( $url );
+  } else {
+    $sth = $class->sql_top_tags( $paging );
+    $sth->execute();
+  }
+
+  return $sth;
 }
 
 1;

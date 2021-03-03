@@ -33,7 +33,7 @@
         <div class="row align-items-center">
           <div class="col-auto">
 % for my $tag (@{ $book->tags }) {
-            <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->display_name %></a>
+            <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->label %></a>
 % }
           </div>
           <div class="col-auto ml-auto">
@@ -47,8 +47,8 @@
           </div>
         </div>
       </div>
-% }
     </div>
+% }
   </div>
 </div>
 

@@ -21,7 +21,7 @@
 
 % } else {
   <div class="nav-item d-none d-md-flex mr-3">
-    <a href="<%= url_for('/u/'.$user->username.'.html') %>" class="nav-link px-0" data-toogle="tooltip" title="<%= __('topmenu-hello-user-tooltip', user_name => $user->display_name || $user->username) %>">
+    <a href="<%= url_for('/user/'.$user->username.'.html') %>" class="nav-link px-0" data-toogle="tooltip" title="<%= __('topmenu-hello-user-tooltip', user_name => $user->display_name || $user->username) %>">
       <i class="fas fa-user"></i>
     </a>
   <div>

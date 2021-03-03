@@ -15,16 +15,13 @@ sub from_user_id {
   my ($class, $user_id) = @_;
 
   $user_cache{ $user_id } //= do {
-    my $user = SorWeTo::Db::User->from_id( $user_id );
+    my ($user) = SorWeTo::Db::User->search_where( id => $user_id );
     unless ($user) {
       $user = SorWeTo::User->anonymous;
     }
 
     $class->new( db_obj => $user );
   };
-
-use Data::Dumper;
-print STDERR "user for $user_id: ", Dumper( $user_cache{ $user_id } );
 
   return $user_cache{ $user_id };
 }
