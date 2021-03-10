@@ -56,6 +56,15 @@ sub global_top_tags {
   return @tags;
 }
 
+sub update_indexes {
+  my ($class, @ids) = @_;
+
+  Bookmrkist::Db::TagCount->update_for_tag( $_ )
+    for @ids;
+
+  return;
+}
+
 sub link {
   my ($self) = @_;
 

@@ -24,9 +24,11 @@ CREATE TABLE `url` (
   `description` varchar(500) DEFAULT NULL,
   `flags` set('active','pending','adult','spam') DEFAULT NULL,
   `base_score` decimal(5,2) DEFAULT NULL,
+  `first_added` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`uuid`),
-  KEY `domain` (`domain`,`url`)
+  KEY `domain` (`domain`,`url`),
+  KEY `first_added` (`first_added`, `flags`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `tag` (

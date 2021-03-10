@@ -52,9 +52,14 @@ sub retrieve {
 }
 
 my %orders = (
-    score   => 'base_score desc',
-    b_score => 'score desc, added asc',
-    t_score => 'max_score desc, first_bookmark_time asc',
+    score     => 'base_score desc',
+    recent    => 'first_added desc',
+
+    b_score   => 'score desc, added asc',
+    b_recent  => 'added desc, score desc',
+
+    t_score   => 'max_score desc, first_bookmark_time asc',
+    t_recent  => 'first_bookmark_time desc, max_score desc',
   );
 sub search {
   my ($class, %filters) = @_;
@@ -69,6 +74,7 @@ sub search {
   my $offset    = ($page - 1) * $count;
 
   my $order     = delete $filters{ order } || 'score';
+  print STDERR "order by '$order'\n\n";
   $order = 'score' unless $orders{ $order };
 
   if ($username) {
@@ -107,6 +113,9 @@ sub search {
 
     @urls = Bookmrkist::Db::Url->search_where( uuid => \@url_ids ) ;
 
+    my %urls = map { $_->uuid => $_ } @urls;
+    @urls = map { $urls{ $_ } || () } @url_ids;
+
   } elsif ( $tag ) {
     my @url_ids = Bookmrkist::Db::UrlTag->search_where({
           tag_id => $filters{'bt.tag_id'}
@@ -116,6 +125,9 @@ sub search {
     @url_ids = map { $_->url_uuid } @url_ids;
     @urls = Bookmrkist::Db::Url->search_where(uuid => \@url_ids);
 
+    my %urls = map { $_->uuid => $_ } @urls;
+    @urls = map { $urls{ $_ } || () } @url_ids;
+
   } else {
     unless ( $filters{ flags } ) {
       $filters{ flags} = { -and => {
@@ -124,6 +136,9 @@ sub search {
                             }
                         };
     }
+
+    use Data::Dumper;
+    print STDERR 'search urls: ', Dumper( \%filters, \%extra );
     @urls = Bookmrkist::Db::Url->search_where( \%filters, \%extra );
 
   }
@@ -131,6 +146,19 @@ sub search {
   @urls = map { $class->new( db_obj => $_ ) } @urls;
 
   return @urls;
+}
+
+sub update_indexes {
+  my ($class, $url) = @_;
+
+  Bookmrkist::Db::UrlTag->update_for_url( $url->uuid );
+  my ($score,$added) = Bookmrkist::Db::Bookmark->stats_for_url( $url->uuid );
+
+  $url->base_score( $score );
+  $url->first_added( $added );
+  $url->update();
+
+  return;
 }
 
 sub link {

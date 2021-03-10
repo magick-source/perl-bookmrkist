@@ -17,9 +17,6 @@ sub search {
   die "Missing 'record_class' or 'db_class' for $class"
     unless $class->record_class or $class->db_class;
 
-use Data::Dumper;
-print STDERR "search: ", Dumper( \@_ );
-
   my %search;
   if ($#_ == 0) {
     %search = %{ $_[0] };

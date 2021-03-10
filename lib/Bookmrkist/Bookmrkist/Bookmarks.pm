@@ -20,6 +20,10 @@ sub list {
     $filters{ username } = $stash->{username}; 
   }
 
+  if ($stash->{recent}) {
+    $filters{ order } = 'recent'
+  }
+
   my @url = Bookmrkist::Data::Url->search( %filters );
 
   $stash->{urls} = \@url;

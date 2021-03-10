@@ -109,6 +109,33 @@ sub search {
   return @bookmarks;
 }
 
+sub add_bookmark {
+  my ($class, $c, $data) = @_;
+
+  my ($url) = Bookmrkist::Db::Url->find_or_create( $data->{url} );
+  $data->{score} = $c->prescore_bookmark( $c->user, $url, $data );
+
+  my ($bookmark) = Bookmrkist::Db::Bookmark->find_or_create({
+      url_uuid  => $url->uuid,
+      title     => $data->{title},
+      comment   => $data->{description},
+      user_id   => $c->user->user_id,
+      score     => $data->{score},
+    });
+
+  my @tags = Bookmrkist::Db::Tag->find_or_create_many( $data->{tags} );
+  my $res = Bookmrkist::Db::BookmarkTag->update_links( $bookmark, \@tags );
+
+  my @links   = @{ $res->{active} || [] };
+  my @deleted = @{ $res->{deleted} || [] };
+  my @up_tagids = map { $_->tag_id } @links, @deleted;
+
+  Bookmrkist::Data::Tag->update_indexes( @up_tagids );
+  Bookmrkist::Data::Url->update_indexes( $url );
+
+  return ($bookmark, $url);
+}
+
 sub link {
   my ($self) = @_;
 

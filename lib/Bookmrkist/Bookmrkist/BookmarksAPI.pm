@@ -3,10 +3,9 @@ package Bookmrkist::Bookmrkist::BookmarksAPI;
 use Mojo::Base qw(Mojolicious::Controller);
 
 use Bookmrkist::Validator;
-use Bookmrkist::Db::Url;
-use Bookmrkist::Db::Tag;
-use Bookmrkist::Db::Bookmark;
-use Bookmrkist::Db::BookmarkTag;
+
+use Bookmrkist::Data::Bookmark;
+use Bookmrkist::Data::Url;
 
 sub add_link {
   my ($c) = @_;
@@ -38,20 +37,7 @@ sub add_link {
 
   my $data = $v->output();
 
-  my ($url) = Bookmrkist::Db::Url->find_or_create( $data->{url} );
-
-  my $score = $c->prescore_bookmark( $c->user, $url, $data );
-
-  my ($bookmark) = Bookmrkist::Db::Bookmark->find_or_create({
-      url_uuid  => $url->uuid,
-      title     => $data->{title},
-      comment   => $data->{description},
-      user_id   => $c->user->user_id,
-      score     => $score,
-    });
-
-  my @tags = Bookmrkist::Db::Tag->find_or_create_many( $data->{tags} );
-  my @links = Bookmrkist::Db::BookmarkTag->update_links( $bookmark, \@tags );
+  my ($bookmark, $url) = Bookmrkist::Data::Bookmark->add_bookmark( $c, $data );
 
   my %res;
   if ( $bookmark ) {

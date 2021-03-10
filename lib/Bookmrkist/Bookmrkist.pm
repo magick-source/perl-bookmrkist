@@ -24,8 +24,11 @@ sub register {
   unshift @{$r->namespaces}, 'Bookmrkist::Bookmrkist';
 
   $r->any('/')->to('Bookmarks#list');
-  # TODO: $r->any('/recent')->to('Bookmarks#list', recent => 1);
-  $r->any('/tag/:tag'=> [tag  => qr/\w[\w\-]{2,}\w/])->to('Bookmarks#list');
+  $r->any('/recent')->to('Bookmarks#list', recent => 1);
+  $r->any('/recent/:tag' => [tag => qr/\w[\w\-]*\w/])
+    ->to('Bookmarks#list', recent => 1);
+
+  $r->any('/tag/:tag'=> [tag  => qr/\w[\w\-]*\w/])->to('Bookmarks#list');
   $r->any('/user/:username' => [username => qr/\w{3,}/])->to('Bookmarks#list');
   $r->any('/user/:username/:tag'
           => [ username => qr/\w{3,}/,

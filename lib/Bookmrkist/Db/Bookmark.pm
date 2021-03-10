@@ -32,6 +32,16 @@ SELECT COUNT(uuid)
     AND find_in_set('active', flags)
 EoQ
 
+__PACKAGE__->set_sql( stats_for_url => <<EoQ );
+SELECT  floor(max(score)*(100+count(score)))/100 as base_score,
+        min( added ) as first_added
+  FROM  __TABLE__
+  WHERE url_uuid = ?
+    AND NOT find_in_set('private', flags)
+    AND NOT find_in_set('adult', flags)
+    AND find_in_set('active', flags)
+EoQ
+
 sub find_or_create {
   my ($class, $bookmark) = @_;
 
@@ -68,5 +78,14 @@ sub count_for_url {
 
   return $count;
 }
+
+sub stats_for_url {
+  my ($class, $url_uuid) = @_;
+
+  my ($score, $added) = $class->sql_stats_for_url()->select_row($url_uuid);
+
+  return ($score, $added );
+}
+
 
 1;

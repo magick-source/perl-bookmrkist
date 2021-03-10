@@ -76,7 +76,7 @@ sub update_links {
     $link->delete;
   }
 
-  return @links;
+  return { active => \@links, deleted => [values %existing] };
 }
 
 sub top_tags {

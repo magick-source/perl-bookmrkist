@@ -21,6 +21,7 @@ __PACKAGE__->columns(Columns => qw(
     description
     flags
     base_score
+    first_added
     last_updated
   ));
 

@@ -23,6 +23,15 @@ DELETE FROM __TABLE__ WHERE url_uuid = ?
 EoQ
 __PACKAGE__->set_sql( update_for_url => <<EoQ );
 INSERT INTO __TABLE__
+  ( tag_id,
+    url_uuid,
+    first_bookmark_time,
+    last_bookmark_time,
+    public_bookmarks,
+    total_score,
+    max_score,
+    last_updated
+  )
   SELECT tag_id, bg.*, NOW()
     FROM (
         SELECT  url_uuid,
@@ -53,7 +62,7 @@ sub update_for_url {
 
   $class->do_transaction(sub {
       $class->sql_delete_for_url()->execute( $url_uuid );
-      $class->sql_update_for_url()->execute( $url_uuid );
+      $class->sql_update_for_url()->execute( $url_uuid, $url_uuid );
     });
 
   return;
