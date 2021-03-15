@@ -15,18 +15,26 @@ __PACKAGE__->columns(Columns => qw(
   ));
 
 __PACKAGE__->set_sql( update_for_tag => <<EoQ );
-SELECT  bt.tag_id,
-        min(b.added) as first_bookmark_time,
-        count(b.uuid) as public_bookmarks,
-        sum(b.score) as total_score,
-        max(b.score) as max_score
-  FROM bookmark_tag bt
-    LEFT JOIN bookmark b
-      ON bt.bookmark_uuid = b.uuid
-  WHERE bt.tag_id = ?
-    AND FIND_IN_SET('active', b.flags)
-    AND NOT FIND_IN_SET('private', b.flags)
-    AND NOT FIND_IN_SET('adult', flags)
+INSERT INTO __TABLE__
+  (tag_id, first_bookmark_time, public_bookmarks, total_score, max_score)
+  SELECT  bt.tag_id,
+          min(b.added) as first_bookmark_time,
+          count(b.uuid) as public_bookmarks,
+          sum(b.score) as total_score,
+          max(b.score) as max_score
+    FROM bookmark_tag bt
+      LEFT JOIN bookmark b
+        ON bt.bookmark_uuid = b.uuid
+    WHERE bt.tag_id = ?
+      AND FIND_IN_SET('active', b.flags)
+      AND NOT FIND_IN_SET('private', b.flags)
+      AND NOT FIND_IN_SET('adult', flags)
+  ON DUPLICATE KEY
+    UPDATE
+      first_bookmark_time=VALUES(first_bookmark_time),
+      public_bookmarks=VALUES(public_bookmarks),
+      total_score=VALUES(total_score),
+      max_score=VALUES(max_score)
 EoQ
 
 sub update_for_tag {
