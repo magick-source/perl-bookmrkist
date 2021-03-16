@@ -4,3 +4,6 @@
 .text-white a:hover {
   color: #fff;
 }
+.navbar .dropdown-menu {
+  z-index: 1050;
+}

@@ -1,30 +1,43 @@
 <div class="navbar-nav flex-row order-md-last">
-  <div class="nav-item d-none d-md-flex mr-3">
+  <div class="nav-item mr-3">
     <a href="<%= url_for('/add') %>.html" class="nav-link px-0" data-toggle="tooltip" title="<%= __('topmenu-addlink-tooltip') %>" >
       <i class="fas fa-plus"></i>
     </a>
   </div>
-% my $user = user();
+% my $user = bk_user();
 % if ( !can_track_user() ) {
-  <div class="nav-item d-none d-md-flex mr-3">
+  <div class="nav-item mr-3">
     <a href="<%= url_for('/user/track-again.html') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-not-tracked-tooltip') %>">
       <i class="fas fa-user-slash"></i>
     </a>
   <div>
 
 % } elsif (!$user or $user->is_anonymous) {
-  <div class="nav-item d-none d-md-flex mr-3">
+  <div class="nav-item mr-3">
     <a href="<%= url_for('/login.html') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-login-tooltip') %>">
       <i class="far fa-user"></i>
     </a>
   <div>
 
 % } else {
-  <div class="nav-item d-none d-md-flex mr-3">
-    <a href="<%= url_for('/user/'.$user->username.'.html') %>" class="nav-link px-0" data-toogle="tooltip" title="<%= __('topmenu-hello-user-tooltip', user_name => $user->display_name || $user->username) %>">
-      <i class="fas fa-user"></i>
+  <div class="nav-item dropdown">
+    <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-toggle="dropdown" aria-label="Open user menu">
+% my $color = $user->icon_color || 'bg-blue';
+      <span class="avatar avatar-md rounded <%= $color %>">
+        <i  class="<%= $user->icon %>"
+          data-bs-toggle="tooltip" data-bs-placement="top"
+          title="<%= $user->display_name %>"></i>
+      </span>
     </a>
-  <div>
+    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+      <a href="<%= url_for('/user/'.$user->username.'.html') %>" class="dropdown-item">
+        My Bookmarks
+      </a>
+      <a href="<%= url_for('/logout/') %>" class="dropdown-item">
+        Logout
+      </a>
+    </div>
+  </div>
 
 % }
 </div>

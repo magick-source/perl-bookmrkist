@@ -54,6 +54,7 @@ sub register {
   $app->helper( needed_js   => \&_needed_js );
   $app->helper( needed_css  => \&_needed_css );
   $app->helper( global_top_tags => \&_global_top_tags );
+  $app->helper( bk_user => \&_get_bk_user );
   $app->html_hook(html_body_end => \&_html_body_end );
   $app->html_hook(html_head     => \&_html_head );
 
@@ -98,6 +99,8 @@ sub _around_action {
     print STDERR "user score: ", $c->user->score(), "\n\n";
   }
 
+  $c->needed_css('/css/bookmrkist.css');
+
   return $next->();
 }
 
@@ -119,6 +122,12 @@ sub _needed_css {
   }
 
   return;
+}
+
+sub _get_bk_user {
+  my ($c) = @_;
+
+  return Bookmrkist::Data::User->new( db_obj => $c->user );
 }
 
 sub _global_top_tags {
