@@ -18,6 +18,9 @@
 % }
           </div>
         </div>
+
+%= include_maybe 'inc/more_sidebar_widgets';
+
       </div>
     </div>
   </div>
