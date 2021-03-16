@@ -17,6 +17,10 @@ sub register {
 
   $self->app($app);
   $self->shared_users(1) if ($conf->{shared_users});
+  
+  $app->defaults->{'logo'} = '/assets/weblore/logo-top.png';
+  $app->defaults->{'favicon'} = '/assets/weblore/favicon.png';
+  $app->defaults->{'footer-text'} = 'Built with Bookmrkist';
 
   Bookmrkist::User->register( $app );
   Bookmrkist::Scoring->register( $app );
