@@ -7,6 +7,7 @@ use Bookmrkist::User;
 use Bookmrkist::Scoring;
 
 use Bookmrkist::Data::Tag;
+use Bookmrkist::Data::User;
 
 has _current_config => 'xxx';
 has 'app';
