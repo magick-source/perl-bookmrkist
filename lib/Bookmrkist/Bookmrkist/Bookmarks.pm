@@ -24,9 +24,31 @@ sub list {
     $filters{ order } = 'recent'
   }
 
-  my @url = Bookmrkist::Data::Url->search( %filters );
+  my $page = $c->param('page');
+  if ($page and $page =~ m{\A\d+\z}) {
+    $filters{ page } = $page;
+  }
+
+  my $min_score;
+  my $user  = $c->user;
+  if (!$user or $user->is_anonymous) {
+    $min_score = 1;
+  } else {
+    # TODO: make min score a user preference/param?
+    $min_score = 0;
+
+    if ($filters{username} and $user->username eq $filters{username}) {
+      $min_score = -999; #we should not have anything lower than this
+      $filters{ own_links } = 1;
+    }
+  }
+  $filters{ min_score } = $min_score;
+
+  my @url         = Bookmrkist::Data::Url->search( %filters );
+  my $page_count  = Bookmrkist::Data::Url->page_count( %filters );
 
   $stash->{urls} = \@url;
+  $stash->{pages} = $page_count;
 
   $c->render( template => 'bookmark/list');
 }

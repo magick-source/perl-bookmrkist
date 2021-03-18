@@ -9,6 +9,7 @@ __PACKAGE__->columns(Primary => qw(bookmark_uuid tag_id));
 __PACKAGE__->columns(Columns => qw(
     bookmark_uuid
     tag_id
+    user_id
     bookmark_time
     bookmark_score
     bookmark_flags
@@ -41,14 +42,12 @@ sub update_links {
       bookmark_uuid => $bookmark->uuid
     });
   
-  my ($time, $score, $flags) = (
+  my ($user_id, $time, $score, $flags) = (
+      $bookmark->user_id,
       $bookmark->added,
       $bookmark->score,
       $bookmark->flags,
     );
-  $flags = join ',',
-      grep { $_ eq 'adult' or $_ eq 'private' }
-      split /,/, $flags;
 
   my @links = ();
   for my $tag (@$tags) {
@@ -63,6 +62,7 @@ sub update_links {
       ($rec) = $class->insert({
           bookmark_uuid   => $bookmark->uuid,
           tag_id          => $tag->id,
+          user_id         => $user_id,
           bookmark_score  => $score,
           bookmark_time   => $time,
           bookmark_flags  => $flags,
