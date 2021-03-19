@@ -46,6 +46,10 @@ sub register {
             => [link_hash => qr/[0-9a-z]{30}/
                ])->to('Bookmarks#view');
 
+  $r->get('/goto/:link_hash'
+            => [link_has => qr/[0-9a-z]{30}/
+               ])->to('Bookmarks#goto');
+
   my $user_api = $r->api_can('add_links');
   $user_api->any('/add-link')->to('BookmarksAPI#add_link');
 

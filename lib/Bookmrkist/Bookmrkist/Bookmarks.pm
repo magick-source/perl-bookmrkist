@@ -2,6 +2,8 @@ package Bookmrkist::Bookmrkist::Bookmarks;
 
 use Mojo::Base qw(Mojolicious::Controller);
 
+use Mojo::URL;
+
 use Bookmrkist::Db::Bookmark;
 use Bookmrkist::Data::Url;
 
@@ -84,6 +86,45 @@ sub view {
     $c->reply->not_found();
   }
 
+}
+
+sub goto {
+  my ($c) = @_;
+
+  my $linkhash  = $c->stash->{ link_hash };
+
+  my $referer   = $c->req->headers->header('Referer');
+  my $is_ok = 0;
+  if ($referer) {
+    my $hostname  = $c->req->url->to_abs->host;
+    my $referhost = Mojo::URL->new( $referer )->host;
+
+    if ($hostname eq $referhost) {
+      $is_ok = 1
+
+    } else {
+      $c->evlog('goto.jump.invalid_referal', $referer);
+    }
+  } else {
+    $c->evlog('goto.jump.missing_referal', 1);
+    $is_ok = 1; #may need to change (or become a config)
+  }
+ 
+  my $jump_to = $c->url_for('/');
+  if ( $is_ok ) {
+    my $url = Bookmrkist::Data::Url->retrieve( $linkhash, $c->user );
+
+    if ( $url ) {
+      $jump_to = $url->url;
+      $c->evlog('goto.jump.jumping', 1);
+
+    } else {
+      $c->evlog('goto.jump.url_missing', 1);
+      return $c->reply->not_found;
+    }
+  }
+  
+  return $c->redirect_to( $jump_to );
 }
 
 1;
