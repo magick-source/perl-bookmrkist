@@ -1,20 +1,20 @@
 <div class="navbar-nav flex-row order-md-last">
   <div class="nav-item mr-3">
-    <a href="<%= url_for('/add') %>.html" class="nav-link px-0" data-toggle="tooltip" title="<%= __('topmenu-addlink-tooltip') %>" >
+    <a href="<%= url_for('/add') %>/" class="nav-link px-0" data-toggle="tooltip" title="<%= __('topmenu-addlink-tooltip') %>" >
       <i class="fas fa-plus"></i>
     </a>
   </div>
 % my $user = bk_user();
 % if ( !can_track_user() ) {
   <div class="nav-item mr-3">
-    <a href="<%= url_for('/user/track-again.html') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-not-tracked-tooltip') %>">
+    <a href="<%= url_for('/user/track-again') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-not-tracked-tooltip') %>">
       <i class="fas fa-user-slash"></i>
     </a>
   <div>
 
 % } elsif (!$user or $user->is_anonymous) {
   <div class="nav-item mr-3">
-    <a href="<%= url_for('/login.html') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-login-tooltip') %>">
+    <a href="<%= url_for('/login/') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-login-tooltip') %>">
       <i class="far fa-user"></i>
     </a>
   <div>
@@ -30,7 +30,7 @@
       </span>
     </a>
     <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-      <a href="<%= url_for('/user/'.$user->username.'.html') %>" class="dropdown-item">
+      <a href="<%= url_for('/user/'.$user->username.'/') %>" class="dropdown-item">
         My Bookmarks
       </a>
       <a href="<%= url_for('/logout/') %>" class="dropdown-item">
