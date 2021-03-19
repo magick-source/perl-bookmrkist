@@ -252,11 +252,14 @@ sub _search_by_tag {
 
   my $order = delete $extra->{order} || 'score';
   $order = "t_$order";
-  $extra->{order_by} = $orders{ $order } || $orders{ "b_recent" };
+  $extra->{order_by} = $orders{ $order } || $orders{ "t_recent" };
 
-  my @url_ids = Bookmrkist::Db::UrlTag->search_where({
-      tag_id => $filters->{'tag_id'}
-    }, $extra );
+  my %filters = (
+      tag_id  => $filters->{tag_id},
+      ($filters->{score} ? ( max_score => $filters->{score} ) : () ),
+    );
+
+  my @url_ids = Bookmrkist::Db::UrlTag->search_where(\%filters, $extra );
   return unless @url_ids;
 
   @url_ids = map { $_->url_uuid } @url_ids;
