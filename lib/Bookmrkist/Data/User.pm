@@ -87,14 +87,14 @@ my @colors = qw(
     pink
     red
     orange
-    yellow
-    lime
     green
     teal
     cyan
   );
 my %textwhite = map { $_ => 1 } @colors;
 push @colors, qw(
+    yellow
+    lime
     blue-lt
     azure-lt
     indigo-lt
@@ -120,6 +120,8 @@ sub _find_icon_color {
 
   if ( $textwhite{ $color } ) {
     $color .= ' text-white';
+  } else {
+    $color .= ' text-primary';
   }
 
   return "bg-$color";
