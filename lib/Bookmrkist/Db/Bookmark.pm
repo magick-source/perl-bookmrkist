@@ -63,12 +63,6 @@ sub find_or_create {
   return $rec;
 }
 
-sub link_hash {
-  my ($self) = @_;
-
-  return uuid2hash( $self->uuid );
-}
-
 sub count_for_url {
   my ($class, $url_uuid) = @_;
 
