@@ -62,7 +62,7 @@ sub link {
   return "/user/".$self->username;
 }
 
-my @icons = qw(user user_tie smile portait user_secret);
+my @icons = qw(user user-tie smile portait user-secret);
 my @extra = qw(fas far);
 sub _find_icon {
   my ($self) = @_;
@@ -87,14 +87,14 @@ my @colors = qw(
     pink
     red
     orange
+    yellow
+    lime
     green
     teal
     cyan
   );
 my %textwhite = map { $_ => 1 } @colors;
 push @colors, qw(
-    yellow
-    lime
     blue-lt
     azure-lt
     indigo-lt
@@ -120,8 +120,6 @@ sub _find_icon_color {
 
   if ( $textwhite{ $color } ) {
     $color .= ' text-white';
-  } else {
-    $color .= ' text-primary';
   }
 
   return "bg-$color";
