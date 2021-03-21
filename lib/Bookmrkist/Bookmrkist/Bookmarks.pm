@@ -46,6 +46,8 @@ sub list {
   }
   $filters{ min_score } = $min_score;
 
+  $filters{ user } = $c->user();
+
   my @url         = Bookmrkist::Data::Url->search( %filters );
   my $page_count  = Bookmrkist::Data::Url->page_count( %filters );
 
@@ -80,6 +82,10 @@ sub view {
 
   if ( $url ) {
     $c->stash->{url_obj} = $url;
+    $c->stash->{pagename}
+      = $c->__('page-title--view-bookmark', 
+          url_title => ($url->page_title || 'bookmark'),
+        ) || $url->page_title || 'View Bookmark';
 
     $c->render( template => 'bookmark/view' );
   } else {

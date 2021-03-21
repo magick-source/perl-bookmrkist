@@ -1,9 +1,12 @@
 % needed_css('bookmrkist.css');
+% needed_js('bookmarks/api','bookmarks/voting');
 <div class="row row-cards justify-content-center">
   <div class="col-10">
     <h3>Comments</h3>
 % for my $book (@{ $url->bookmarks }) {
-    <div class="card">
+% my $blink = $book->link_hash;
+% my $card_id= "id='bookmark-$blink'";
+    <div class="card" <%= b($card_id) %>>
 % if ( $book->highlight ) {
       <div class="card-status-left bg-primary"></div>
 % }
@@ -19,7 +22,7 @@
                     data-bs-toggle="tooltip" data-bs-placement="top"
                     title="<%= $user->display_name %>"></i>
 % unless ( $user->is_anonymous ) {
-            </a>
+              </a>
 % } 
             </span>
           </div>
@@ -38,11 +41,15 @@
           </div>
           <div class="col-auto ml-auto">
             <ul class="nav nav-pills">
-%   for my $icon (@{ $book->vote->icons} ) {
-              <li class="nav-item <%= $icon->color %>">
-                <i class="<%= $icon->icon %>" ></i>
-              </li>
-%   }
+% my $vote = $book->vote();
+% my @icons = @{ $vote->icons };
+% for my $icon ( @icons ) {
+            <li class="nav-item">
+              <a class="nav-link <%= $icon->vote_class %> <%= $icon->color %>" href="#">
+                <i class="<%= $icon->icon %>"></i>
+              </a>
+            </li>
+% }
             </ul>
           </div>
         </div>

@@ -1,5 +1,8 @@
 % layout 'with-sidebar', sidebar_left => 0, title => $pagename || 'List';
-
+% needed_js('bookmarks/api','bookmarks/voting');
+<script>
+var $BkVToken = '<%= csrf_token() %>';
+</script>
 <h2>Bookmarks</h2>
 
 % my $urls = stash('urls') || [];

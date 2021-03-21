@@ -1,6 +1,9 @@
 % layout 'with-sidebar', sidebar_left => 0, title => $pagename || 'List';
 % my $url = stash('url_obj');
 % my $title = $url->page_title || $url->bookmarks->[0]->title;
+<script>
+var $BkVToken = '<%= csrf_token() %>';
+</script>
 
 %= include 'bookmark/inc/url-main', url => $url, on_list => 0;
 

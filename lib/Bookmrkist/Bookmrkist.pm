@@ -52,6 +52,7 @@ sub register {
 
   my $user_api = $r->api_can('add_links');
   $user_api->any('/add-link')->to('BookmarksAPI#add_link');
+  $user_api->post('/vote')->to('BookmarksAPI#vote');
 
   # to make multi-site work
   $app->hook(around_action  => sub { $self->_around_action( @_ ) });

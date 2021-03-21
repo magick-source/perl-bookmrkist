@@ -72,4 +72,39 @@ sub add_link {
   return $c->render(json => \%res);
 }
 
+sub vote {
+  my ($c) = @_;
+
+  my $input = {
+    bookmark    => $c->param('bookmark'),
+    vote_type   => $c->param('vote_type'),
+    csrf_token  => $c->param('vote_token'),
+  };
+
+  use Data::Dumper;
+  print STDERR "voting prevalidate: ", Dumper( $input );
+
+  my $v = Bookmrkist::Validator->new->validation();
+  $v->input( $input );
+  $v->csrf_token( $c->csrf_token )
+    unless $c->stash->{oathed};
+
+  $v->required('bookmark','trim','not_empty')->link_hash();
+  $v->required('vote_type','trim','not_empty')->vote_type();
+  $v->csrf_protect()
+    unless $c->stash->{oathed};
+
+  return $c->handle_input_errors( $v, api_errors => 1 )
+    if $v->has_error();
+
+  my $data = $v->output();
+
+  my ($resdata) = Bookmrkist::Data::Bookmark->cast_vote( $c, $data );
+
+  $c->res->code( delete $resdata->{http_code} )
+    if exists $resdata->{http_code};
+
+  return $c->render(json => $resdata );
+}
+
 1;

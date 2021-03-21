@@ -5,11 +5,20 @@ $Bk = {
     if ( ! this._inited )
       return;
 
-    console.log( { 'this': this });
-
     var formdata = $( form_selector ).serialize();
 
     return this._post( 'add-link', formdata );
+  },
+
+  vote: function ( bookmark_id, vote_type, token ) {
+    if ( ! this._inited )
+      return;
+
+    return this._post('vote', {
+          "bookmark": bookmark_id,
+          "vote_type": vote_type,
+          "vote_token": token
+      });
   },
 
   _post: function( method, data ) {

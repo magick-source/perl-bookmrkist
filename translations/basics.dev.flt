@@ -21,3 +21,6 @@ placeholder--url-description= Description of the link or why
 fieldname--url-tags         = Tags
 placeholder--url-tags       = comma, separated, tags
 button--add-link            = Add link
+
+# view url bookmarks
+page-title--view-bookmark   = View Bookmarks for '{$url_title}'

@@ -22,7 +22,7 @@ sub post_register {
 sub user_score {
   my ($user) = @_;
 
-  return $user->anonymous ? 0 : 1;
+  return $user->is_anonymous ? 0 : 1;
 
 }
 
@@ -54,7 +54,7 @@ my %rights  = (
 
   vote_like       => 'newbie',
   vote_dislike    => 'linker',
-  vote_love       => 'moderator',
+  vote_love       => 'linker',
   vote_hate       => 'moderator',
   vote_spam       => 'manager',
 );
@@ -66,7 +66,7 @@ my %anonymous_rights = map { $_ => 1 } qw(
 sub _user_has_right {
   my ($next, $user, $right) = @_;
 
-  if ( $user->anonymous ) {
+  if ( $user->is_anonymous ) {
     return $anonymous_rights{ $right } || 0;
   }
 

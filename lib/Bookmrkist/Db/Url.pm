@@ -25,6 +25,21 @@ __PACKAGE__->columns(Columns => qw(
     last_updated
   ));
 
+__PACKAGE__->set_sql(update_base_score => <<EoQ );
+INSERT INTO __TABLE__
+  (uuid, base_score)
+  SELECT url_uuid, max(score)
+    FROM bookmark b
+    WHERE url_uuid = ?
+      AND FIND_IN_SET('active', b.flags)
+      AND NOT FIND_IN_SET('private', b.flags)
+      AND NOT FIND_IN_SET('adult', flags)
+    GROUP by url_uuid
+  ON DUPLICATE KEY
+    UPDATE
+      base_score=VALUES(base_score)
+EoQ
+
 sub find_or_create {
   my ($class, $url) = @_;
 
@@ -48,6 +63,14 @@ sub find_or_create {
   }
 
   return $rec;
+}
+
+sub update_base_score {
+  my ($class, $url_uuid) = @_;
+
+  $class->sql_update_base_score()->execute( $url_uuid );
+
+  return;
 }
 
 1;

@@ -71,17 +71,19 @@ my %orders = (
 sub search {
   my ($class, %filters) = @_;
 
+  my ($user) = delete $filters{ user };
+
   my ($filters,$extra) = $class->_common_search_setup( %filters );
   return unless $filters and $extra;
 
-  my $tag   = $filters->{ tag_id };
-  my $user  = $filters->{ user_id };
+  my $tag_id   = $filters->{ tag_id };
+  my $user_id  = $filters->{ user_id };
 
   my @urls;
-  if ( $user ) {
+  if ( $user_id ) {
     @urls = $class->_search_by_user( $filters, $extra );
 
-  } elsif ( $tag ) {
+  } elsif ( $tag_id ) {
 
     @urls = $class->_search_by_tag( $filters, $extra );
 
@@ -97,8 +99,21 @@ sub search {
 
   }
 
-  # support returning highlight
-  @urls = map { ref $_ eq 'HASH' ? $_ : { db_obj => $_ } } @urls;
+  for my $url ( @urls ) {
+    # if $url is blessed, it is a db_obj
+    $url = { db_obj => $url } unless ref $url eq 'HASH';
+
+    $url->{user} //= $user if $user;
+    if ( $url->{highlight} ) {
+      use Data::Dumper;
+      print STDERR "building hightlight: ", Dumper($user);
+      $url->{highlight} = Bookmrkist::Data::Bookmark->new(
+          db_obj  => $url->{highlight},
+          ($user  ?  (viewer => $user) : ()),
+          url     => $url,
+        );
+    }
+  }
 
   @urls = map { $class->new( %$_ ) } @urls;
 
@@ -240,7 +255,9 @@ sub _search_by_user {
     
     push @urls, {
         db_obj => $urls{ $uuid },
-        highlight => $book_by_url{ $uuid }
+        highlight => Bookmrkist::Data::Bookmark->new(
+                        db_obj => $book_by_url{ $uuid },
+                      )
       };
   }
 

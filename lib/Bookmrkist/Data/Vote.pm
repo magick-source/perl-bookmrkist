@@ -2,33 +2,36 @@ package Bookmrkist::Data::Vote;
 
 use Mojo::Base q(Bookmrkist::Data::Base);
 
+use Bookmrkist::Db::BookmarkVote;
+
 use Bookmrkist::Data::VoteIcon;
 
 __PACKAGE__->db_class('Bookmrkist::Db::BookmarkVote');
 
 has 'user';
+has 'owner_id';
 has icons => \&_find_icons;
 
-my %icons = (
-    love    => 'grin_hearts',
-    like    => 'heart',
-    dislike => 'heartbroke',
-    hate    => 'angry',
-  );
-
 my @icon_order = qw(
-  love like dislike hate
+  love like dislike hate spam
 );
 
 sub _find_icons {
   my ($self) = @_;
 
+  return [] unless $self->user and $self->owner_id;
+  
+  my $state = '';
+  $state = 'disabled' if $self->user->user_id == $self->owner_id;
+
   my %icons;
+  my $voted = 0;
   if (my $vote = $self->db_obj) {
-    $icons{ $vote->type} = Bookmrkist::Data::VoteIcon->new( 
-                              type  => $vote->type,
+    $icons{ $vote->vote_type } = Bookmrkist::Data::VoteIcon->new( 
+                              type  => $vote->vote_type,
                               state => 'voted'
                             );
+    $voted = 1;
   }
 
   my $user = $self->user;
@@ -39,16 +42,15 @@ sub _find_icons {
 
     $icons{ $itype } = Bookmrkist::Data::VoteIcon->new(
         type  => $itype,
-        state => 'can_vote', 
+        state => $state || ($voted ? 'voted-other' : 'can_vote'), 
       );
   }
-
-  use Data::Dumper;
-  print STDERR "icons: ", Dumper( $self );
 
   my @icons = map { $icons{ $_ } ? $icons{ $_ } : () } @icon_order;
 
   return \@icons;
 }
+
+__PACKAGE__->make_column_accessors( );
 
 1;

@@ -4,8 +4,11 @@
 %     $title = $bmrk->title;
 %   } else { $title = 'untitled' }
 % }
+% my $bookmark = $url->highlight;
+% my $blink = $bookmark->link_hash;
+% my $card_id= $on_list ? "id='bookmark-$blink'" : "";
 <div class="row row-cards"><div class="col-12">
-  <div class="card">
+  <div class="card" <%= b($card_id) %>>
     <div class="card-body">
       <h2 class="card-title">
 % if ( $on_list ) {
@@ -21,22 +24,57 @@
       </div>
 % if ($url->description) {
       <p><%= $url->description %></p>
+% } elsif ( $on_list and $bookmark ) {
+% my $user = $bookmark->user; my $color=$user->icon_color || 'bg-blue';
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <p class="avatar avatar-sm rounded <%= $color %>">
+% unless ( $user->is_anonymous ) {
+            <a href="<%= url_for( $user->link ) %>" >
+% }
+              <i  class="<%= $user->icon %>"
+                  data-bs-toggle="tooltip" data-bs-placement="top"
+                  title="<%= $user->display_name %>"></i>
+% unless ( $user->is_anonymous ) {
+            </a>
+% }
+          </p>
+        </div>
+        <div class="col">
+          <p><%= $bookmark->comment %></p>
+        </div>
+      </div>
 % }
     </div>
     <div class="card-footer">
       <div class="row align-items-center">
         <div class="col-auto">
-% for my $tag (@{ $url->top_tags }) {
-          <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->label %></a>
-% }
-        </div>
-        <div class="col-auto ml-auto">
           <ul class="nav nav-pills">
             <li class="nav-item text-primary">
               <i class="far fa-user"></i> <%= $url->count_bookmarks %>
             </li>
           </ul>
         </div>
+        <div class="col-auto">
+% for my $tag (@{ $url->top_tags }) {
+          <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->label %></a>
+% }
+        </div>
+% if ( $on_list ) {
+        <div class="col-auto ml-auto">
+          <ul class="nav nav-pills">
+% my $vote = $bookmark->vote();
+% my @icons = @{ $vote->icons };
+% for my $icon ( @icons ) {
+            <li class="nav-item">
+              <a class="nav-link <%= $icon->vote_class %> <%= $icon->color %>" href="#">
+                <i class="<%= $icon->icon %>"></i>
+              </a>
+            </li>
+% }
+          </ul>
+        </div>
+% }
       </div>
     </div>
   </div>
