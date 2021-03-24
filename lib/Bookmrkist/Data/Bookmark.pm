@@ -79,16 +79,16 @@ sub search {
   } else {
     @bookmarks = sort { $b->$ordfld() <=> $a->$ordfld() } @bookmarks;
   }
-  
+
   if ( $highlight ) {
     my ($chosen) = grep {
         $_->uuid eq $highlight
       } @bookmarks;
 
     if ($chosen) {
-      @bookmarks = $chosen, grep {
+      @bookmarks = ( $chosen, grep {
           $_->uuid ne $highlight
-        } @bookmarks;
+        } @bookmarks );
       $chosen->{highlight} = 1;
     }
   }
