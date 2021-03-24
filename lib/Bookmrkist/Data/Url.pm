@@ -121,9 +121,34 @@ sub search {
 }
 
 sub page_count {
+  my ($class, %filters) = @_;
 
-  # TODO: implement page_count
-  return 1;
+  my ($user) = delete $filters{ user };
+
+  my ($filters,$extra) = $class->_common_search_setup( %filters );
+  return 0 unless $filters and $extra;
+
+  my $pagesize = $extra->{limit};
+
+  my $tag_id   = $filters->{ tag_id };
+  my $user_id  = $filters->{ user_id };
+
+  my $count;
+  if ( $user_id ) {
+    $count = $class->_page_count_user( $filters );
+
+  } elsif ( $tag_id ) {
+    $count = $class->_page_count_tag( $filters );
+
+  } else {
+    $filters->{base_score} = delete $filters->{score} if $filters->{score};
+    $count = Bookmrkist::Db::Url->search_where_count( $filters );
+  }
+
+  $count = $count / $pagesize;
+  $count =int( $count) + 1 unless  $count == int( $count );
+
+  return $count;
 }
 
 sub _common_search_setup {
@@ -202,6 +227,32 @@ sub _find_search_flags {
   return @flag_filters;
 }
 
+sub _refilter_for_user {
+  my ($class, $filters) = @_;
+
+  my %filters = %$filters;
+  $filters{ bookmark_score } = delete $filters{ score } if $filters{ score };
+  if ($filters{ -and } ) {
+    my @filters;
+    for my $filter ( @{ $filters{-and} } ) {
+      if (ref $filter
+          and ref $filter eq 'REF'
+          and ref $$filter eq 'ARRAY') {
+
+        my ($cond, @binds) = @{$$filter};
+        $cond =~ s{flags}{bookmark_flags};
+        push @filters, \[ $cond, @binds ];
+
+      } else {
+        push @filters, $filter;
+      }
+    }
+    $filters{-and} = \@filters;
+  }
+
+  return \%filters;
+}
+
 sub _search_by_user {
   my ($class, $filters, $extra) = @_;
 
@@ -209,29 +260,11 @@ sub _search_by_user {
 
   if ( $filters->{tag_id} ) {
 
-    my %filters = %$filters;
-    $filters{ bookmark_score } = delete $filters{ score } if $filters{ score };
-    if ($filters{ -and } ) {
-      my @filters;
-      for my $filter ( @{ $filters{-and} } ) {
-        if (ref $filter
-            and ref $filter eq 'REF'
-            and ref $$filter eq 'ARRAY') {
+    my $flts = $class->_refilter_for_user( $filters );
 
-          my ($cond, @binds) = @{$$filter};
-          $cond =~ s{flags}{bookmark_flags};
-          push @filters, \[ $cond, @binds ];
-
-        } else {
-          push @filters, $filter;
-        }
-      }
-      $filters{-and} = \@filters;
-    }
-   
     $extra->{ order_by } = $orders{ "bt_$order" } || $orders{ "bt_recent " };
 
-    my @bkuuids = Bookmrkist::Db::BookmarkTag->search_where(\%filters, $extra);
+    my @bkuuids = Bookmrkist::Db::BookmarkTag->search_where($flts, $extra);
     return unless @bkuuids;
 
     delete $filters->{tag_id};
@@ -262,6 +295,21 @@ sub _search_by_user {
   }
 
   return @urls;
+}
+
+sub _page_count_user {
+  my ($class, $filters) = @_;
+
+  my $count = 0;
+
+  if ( $filters->{tag_id} ) {
+    $filters = $class->_refilter_for_user( $filters );
+    $count = Bookmrkist::Db::BookmarkTag->search_where_count( $filters );
+  } else {
+    $count = Bookmrkist::Db::Bookmark->search_where_count( $filters );
+  }
+
+  return $count;
 }
 
 sub _search_by_tag {
