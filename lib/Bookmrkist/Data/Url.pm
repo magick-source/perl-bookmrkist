@@ -154,7 +154,7 @@ sub page_count {
 sub _common_search_setup {
   my ($class, %filters) = @_;
 
-  my $count     = delete $filters{page_size} || 5;
+  my $count     = delete $filters{page_size} || 13;
   $count = 15 if $count < 1 or $count > 50;
 
   my $page      = delete $filters{page} || 1;
