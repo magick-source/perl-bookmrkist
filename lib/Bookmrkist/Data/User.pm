@@ -62,8 +62,16 @@ sub link {
   return "/user/".$self->username;
 }
 
-my @icons = qw(user user-tie smile portait user-secret);
-my @extra = qw(fas far);
+#my @icons = qw(user user-tie smile portait user-secret);
+#my @extra = qw(fas far);
+my @icons = (
+    'fas fa-user',
+    'far fa-user',
+    'fas fa-user-tie',
+    'fas fa-smile',
+    'far fa-smile',
+    'fas fa-user-secret',
+  );
 sub _find_icon {
   my ($self) = @_;
 
@@ -72,9 +80,7 @@ sub _find_icon {
   }
 
   my $wid = $self->_weird_id;
-  my $icon = $extra[ $wid % scalar @extra];
-  $icon .= ' ';
-  $icon .= 'fa-'.$icons[ $wid % scalar @icons ];
+  my $icon = $icons[ $wid % scalar @icons];
 
   return $icon;
 }
