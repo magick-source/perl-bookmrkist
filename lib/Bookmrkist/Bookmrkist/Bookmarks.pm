@@ -80,7 +80,7 @@ sub view {
 
   my $url = Bookmrkist::Data::Url->retrieve( $linkhash, $c->user, $bookhash ); 
 
-  if ( $url ) {
+  if ( $url and $url->highlight ) {
     $c->stash->{url_obj} = $url;
     $c->stash->{pagename}
       = $c->__('page-title--view-bookmark', 
