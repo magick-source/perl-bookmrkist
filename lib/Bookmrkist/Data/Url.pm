@@ -154,7 +154,7 @@ sub page_count {
 sub _common_search_setup {
   my ($class, %filters) = @_;
 
-  my $count     = delete $filters{page_size} || 13;
+  my $count     = delete $filters{page_size} || 5;
   $count = 15 if $count < 1 or $count > 50;
 
   my $page      = delete $filters{page} || 1;
@@ -334,6 +334,19 @@ sub _search_by_tag {
   @urls = map { $urls{ $_ } || () } @url_ids;
 
   return @urls;
+}
+
+sub _page_count_tag {
+  my ($class, $filters) = @_;
+
+  my %filters = (
+      tag_id  => $filters->{tag_id},
+      ($filters->{score} ? ( max_score => $filters->{score} ) : () ),
+    );
+
+  my $count = Bookmrkist::Db::UrlTag->search_where_count(\%filters );
+
+  return $count;
 }
 
 sub update_indexes {

@@ -1,0 +1,54 @@
+% my $paging = stash('paging');
+% if ( $paging and $paging->total_pages > 1) {
+
+% my $first = $paging->first;
+% my $last  = $paging->last;
+% my $cur   = $paging->cur_page;
+% my $total = $paging->total_pages;
+
+<div class="row">
+  <div class="ml-auto col-auto">
+    <ul class="pagination">
+% if ($first > 1) {
+      <li class="page-item">
+        <a class="page-link" href="<%= $paging->page_url(1) %>">
+          <i class="fas fa-angle-double-left"></i>
+        </a> 
+      </li>
+% }
+% if ($cur > 1) {
+      <li class="page-item">
+        <a class="page-link" href="<%= $paging->page_url($cur - 1) %>">
+          <i class="fas fa-angle-left"></i>
+        </a> 
+      </li>
+% }
+% for my $pn ($first..$last) {
+%   my $active = ($pn == $cur ? 'active' : '' );
+      <li class="page-item <%= $active %>">
+        <a class="page-link" href="<%= $paging->page_url($pn) %>">
+          <%= $pn %>
+        </a> 
+      </li>
+% }
+% if ($cur < $total) {
+      <li class="page-item">
+        <a class="page-link" href="<%= $paging->page_url($cur + 1) %>">
+          <i class="fas fa-angle-right"></i>
+        </a> 
+      </li>
+% }
+% if ($last < $total) {
+      <li class="page-item">
+        <a class="page-link" href="<%= $paging->page_url($total) %>">
+          <i class="fas fa-angle-double-right"></i>
+        </a> 
+      </li>
+% }
+
+    </ul>
+  </div>
+</div>
+
+% }
+

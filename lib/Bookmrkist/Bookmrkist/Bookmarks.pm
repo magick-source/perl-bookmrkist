@@ -6,6 +6,7 @@ use Mojo::URL;
 
 use Bookmrkist::Db::Bookmark;
 use Bookmrkist::Data::Url;
+use Bookmrkist::Data::Paging;
 
 sub list {
   my ($c) = @_;
@@ -52,7 +53,11 @@ sub list {
   my $page_count  = Bookmrkist::Data::Url->page_count( %filters );
 
   $stash->{urls} = \@url;
-  $stash->{pages} = $page_count;
+  $stash->{paging} = Bookmrkist::Data::Paging->new(
+                        cur_page      => ($page || 1),
+                        total_pages   => ($page_count || 1),
+                        base_url      => $c->req->url,
+                      );
 
   $c->render( template => 'bookmark/list');
 }
