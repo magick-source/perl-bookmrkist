@@ -49,7 +49,7 @@ sub retrieve {
   my $self = $class->new(
       db_obj        => $url,
       user          => $user,
-      highlight_uuid => $book_hash,
+      ($book_hash ? (highlight_uuid => hash2uuid( $book_hash )):()),
     );
 
   return $self;
@@ -362,14 +362,19 @@ sub _load_bookmarks {
 sub _load_highlight {
   my ($self) = @_;
 
-  my %filters = ( order => 'score', user  => $self->user );
-  if ( $self->highlight_uuid ) {
-    $filters{ uuid }      = $self->highlight_uuid;
-  } else {
-    $filters{ url_uuid }  = $self->uuid;
+  if ( $self->highlight_uuid) {
+    my %filters = (
+        uuid  => $self->highlight_uuid,
+        user  => $self->user,
+      );
+
+    my ($book) = Bookmrkist::Data::Bookmark->search( %filters );
+
+    return $book if $book;
   }
 
-  my ($book) = Bookmrkist::Data::Bookmark->search( %filters );
+  my $bookmarks = $self->bookmarks;
+  my ($book) = $bookmarks->[0];
 
   return $book;
 }
