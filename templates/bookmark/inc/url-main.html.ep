@@ -1,6 +1,6 @@
 % my $title = $url->page_title;
 % unless ( $title ) {
-%   if ( my $bmrk = $url->bookmarks->[0] ) {
+%   if ( my $bmrk = $url->highlight ) {
 %     $title = $bmrk->title;
 %   } else { $title = 'untitled' }
 % }
