@@ -25,6 +25,8 @@ sub page_url {
 
   my $url = $self->base_url;
 
+  $page = undef if $page and $page == 1;
+
   $url->query->merge(page => $page);
 
   return $url->to_string;
