@@ -51,7 +51,7 @@ sub global_top_tags {
             $class->new( db_obj => $_, count => $tag_counts{ $_->id } )
           } @tags;
 
-  @tags = sort { $b->count <=>$a->count || $b->url cmp $a->url } @tags;
+  @tags = sort { $a->url cmp $b->url } @tags;
 
   return @tags;
 }
