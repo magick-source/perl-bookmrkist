@@ -74,6 +74,8 @@ sub post_register {
 
   $app->register_themes('bookmrkist');
   $app->register_translations('translations', { application => 'bookmrkist' });
+
+  $app->register_user_setting({ name => 'user_score', is_number => 1});
 }
 
 sub _around_action {

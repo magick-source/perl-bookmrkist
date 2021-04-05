@@ -22,8 +22,13 @@ sub post_register {
 sub user_score {
   my ($user) = @_;
 
-  return $user->is_anonymous ? 0 : 1;
+  if ( $user->is_anonymous ) {
+    return 0;
+  }
 
+  my $score = $user->settings->get('user_score') || 0;
+
+  return $score;
 }
 
 sub vote_score {
@@ -79,7 +84,7 @@ sub _user_has_right {
   }
 
   if ( defined $role_scores{ $role } ) {
-    return 1 if  $user_score > $role_scores{ $role };
+    return 1 if  $user_score >= $role_scores{ $role };
 
     return 0;
   }
