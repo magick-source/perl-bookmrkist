@@ -62,6 +62,12 @@ sub link {
   return "/user/".$self->username;
 }
 
+sub settings {
+  my ($self) = shift;
+
+  return $self->db_obj->settings( @_ );
+}
+
 #my @icons = qw(user user-tie smile portait user-secret);
 #my @extra = qw(fas far);
 my @icons = (
