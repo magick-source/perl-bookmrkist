@@ -8,6 +8,15 @@ has db_obj => undef;
 
 __PACKAGE__->mk_classdata('db_class');
 
+sub retrieve {
+  my ($class) = shift;
+
+  my $db_class = $class->db_class;
+  my $rec = $db_class->retrieve( @_ );
+
+  return $class->new( db_obj => $rec );
+}
+
 sub _make_method {
   my $class = shift;
 

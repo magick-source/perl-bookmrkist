@@ -221,7 +221,7 @@ sub cast_vote {
   my $uuid = hash2uuid( $book_hash );
   return \%res unless $uuid;
 
-  my ($bookmark) = Bookmrkist::Db::Bookmark->retrieve( $uuid );
+  my ($bookmark) = $class->retrieve( $uuid );
   unless ($bookmark) {
     $res{errors}[0]{message} = "Bookmark doesn't exist";
     $res{http_error} = 404;
@@ -291,9 +291,11 @@ sub _cast_vote {
   }
 
   if ( $netscore ) {
-    my $score = $bookmark->score() + $netscore;
-    $bookmark->score( $score );
-    $bookmark->update();
+    my $db_book = $bookmark->db_obj;
+
+    my $score = $db_book->score() + $netscore;
+    $db_book->score( $score );
+    $db_book->update();
 
     my @tags = map { $_->db_obj } @{ _load_tags( $bookmark ) };
     Bookmrkist::Db::BookmarkTag->update_links( $bookmark, \@tags );
@@ -302,6 +304,9 @@ sub _cast_vote {
 
     Bookmrkist::Db::UrlTag->update_for_url( $bookmark->url_uuid );
     Bookmrkist::Db::Url->update_base_score( $bookmark->url_uuid );
+
+    my $user = $bookmark->user;
+    $user->settings->increment_by('user_score', $netscore);
   }
 
   return (1, \%resdata );
