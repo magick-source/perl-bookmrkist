@@ -2,7 +2,6 @@ package Bookmrkist::User;
 
 use Mojo::Base -base;
 
-
 sub register {
   my ($class, $app) = @_;
 
@@ -16,7 +15,7 @@ sub post_register {
   my ($class, $app) = @_;
 
   $app->add_user_helper( score => \&user_score );
-  $app->add_user_helper( vote_score => \&vote_score );
+  $app->add_user_helper( vote_score => sub { vote_score( $app, @_) });
 }
 
 sub user_score {
@@ -32,12 +31,16 @@ sub user_score {
 }
 
 sub vote_score {
-  my ($user) = @_;
+  my ($app, $user) = @_;
 
   my $vote = 1;
   $vote = 0 if $user->score <= 0;
 
-  return $vote;
+  my $fvote = $app->plugins->emit_chain( 'vote_score', $user, $vote );
+
+  $fvote = $vote unless defined $fvote;
+
+  return $fvote;
 }
 
 #TODO(maybe): Make the scores for each right configurabl
