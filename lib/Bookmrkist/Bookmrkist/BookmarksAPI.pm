@@ -81,9 +81,6 @@ sub vote {
     csrf_token  => $c->param('vote_token'),
   };
 
-  use Data::Dumper;
-  print STDERR "voting prevalidate: ", Dumper( $input );
-
   my $v = Bookmrkist::Validator->new->validation();
   $v->input( $input );
   $v->csrf_token( $c->csrf_token )
