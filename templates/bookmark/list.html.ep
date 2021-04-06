@@ -6,9 +6,15 @@ var $BkVToken = '<%= csrf_token() %>';
 <h2>Bookmarks</h2>
 
 % my $urls = stash('urls') || [];
-% for my $url ( @$urls ) {
+% my $middle = int( (scalar @$urls / 2) +.5 );
+% my $c = 0;
+% for my $url ( @$urls ) { $c++;
 
 %= include 'bookmark/inc/url-main', url => $url, on_list => 1;
+
+% if ( $c == $middle ) {
+%= include 'inc/list_middle_widget';
+% }
 
 % }
 
