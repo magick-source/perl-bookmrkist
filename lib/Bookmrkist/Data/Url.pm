@@ -174,7 +174,7 @@ sub _common_search_setup {
   }
 
   if ( exists $filters{min_score} ) {
-    $filters{ score } = { '>' => delete $filters{min_score} };
+    $filters{ score } = { '>=' => delete $filters{min_score} };
   }
 
   my $username  = delete $filters{ username };
