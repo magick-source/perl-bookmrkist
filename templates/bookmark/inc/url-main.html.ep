@@ -27,21 +27,20 @@
 % } elsif ( $on_list and $bookmark ) {
 % my $user = $bookmark->user; my $color=$user->icon_color || 'bg-blue';
       <div class="row align-items-center">
-        <div class="col-auto">
-          <p class="avatar avatar-sm rounded <%= $color %>">
+        <div class="col">
 % unless ( $user->is_anonymous ) {
-            <a href="<%= url_for( $user->link ) %>" >
+          <a href="<%= url_for( $user->link ) %>" >
 % }
+            <span class="avatar avatar-sm rounded <%= $color %>">
               <i  class="<%= $user->icon %>"
                   data-bs-toggle="tooltip" data-bs-placement="top"
                   title="<%= $user->display_name %>"></i>
+            </span>
 % unless ( $user->is_anonymous ) {
-            </a>
+            <b><%= $user->display_name %></b>:
+          </a>
 % }
-          </p>
-        </div>
-        <div class="col">
-          <p><%= $bookmark->comment %></p>
+          <span><%= $bookmark->comment %></span>
         </div>
       </div>
 % }

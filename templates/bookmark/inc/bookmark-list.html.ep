@@ -12,19 +12,20 @@
 % }
       <div class="card-body">
         <div class="row row-cards">
-          <div class="col-auto">
+          <div class="col-2 text-center">
 % my $user = $book->user; my $color = $user->icon_color || 'bg-blue';
-            <span class="avatar avatar-lg rounded <%= $color %>">
 % unless ( $user->is_anonymous ) {
-              <a href="<%= url_for( $user->link ) %>" >
+            <a href="<%= url_for( $user->link ) %>" >
 % }
+              <div class="avatar avatar-lg rounded <%= $color %>">
                 <i  class="<%= $user->icon %>"
                     data-bs-toggle="tooltip" data-bs-placement="top"
                     title="<%= $user->display_name %>"></i>
+              </div>
 % unless ( $user->is_anonymous ) {
-              </a>
+              <h3 class="m-0 mb-1"><%= $user->display_name %></h3> 
+            </a>
 % } 
-            </span>
           </div>
           <div class="col">
             <h3 class="card-title"><%= $book->title %></h3>
