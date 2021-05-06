@@ -254,6 +254,8 @@ sub _cast_vote {
   my $vote = $voter->vote_score();
   $vote *= $vote_multiplier{ $vote_type };
 
+  $vote = 0 + sprintf "%.2f", $vote;
+
   my ($old_vote) = Bookmrkist::Db::BookmarkVote->retrieve(
       bookmark_uuid => $bookmark->uuid,
       user_id       => $voter->user_id,
@@ -291,6 +293,8 @@ sub _cast_vote {
   }
 
   if ( $netscore ) {
+    $netscore = 0 + sprintf "%.2f", $netscore;
+
     my $db_book = $bookmark->db_obj;
 
     my $score = $db_book->score() + $netscore;
