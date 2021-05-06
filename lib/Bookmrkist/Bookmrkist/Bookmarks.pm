@@ -49,6 +49,8 @@ sub list {
 
   $filters{ user } = $c->user();
 
+  __add_sort_links( $c, \%filters );
+
   my @url         = Bookmrkist::Data::Url->search( %filters );
   my $page_count  = Bookmrkist::Data::Url->page_count( %filters );
 
@@ -60,6 +62,67 @@ sub list {
                       );
 
   $c->render( template => 'bookmark/list');
+}
+
+sub __add_sort_links {
+  my ($c, $filters) = @_;
+
+  my $uname   = $filters->{username};
+  my $tag     = $filters->{tag};
+  my $srecent = ($filters->{order} eq 'recent' ) ? 1 : 0;
+
+  my @sorts;
+  $c->stash->{sort_links} = \@sorts;
+
+  if ( $srecent ) {
+    my $lnk = '';
+    if ($uname and $tag) {
+      $lnk = "/user/$uname/$tag";
+
+    } elsif ($uname) {
+      $lnk = "/user/$uname";
+
+    } elsif ($tag) { 
+      $lnk = "/tag/$tag";
+
+    } else {
+      $lnk = "/";
+    }
+
+    @sorts = (
+      { label => $c->translate("list-links--sort-top"),
+        href  => $lnk,
+      },{
+        label => $c->translate("list-links--sort-recent"),
+      }
+    );
+  } else {
+    my $lnk = '';
+    if ($uname and $tag) {
+      $lnk = "/recent/u/$uname/$tag";
+
+    } elsif ($uname) {
+      $lnk = "/recent/u/$uname";
+
+    } elsif ($tag) { 
+      $lnk = "/recent/$tag";
+
+    } else {
+      $lnk = "/recent";
+    }
+
+    @sorts = (
+      {
+        label => $c->translate("list-links--sort-top"),
+      },{
+        label => $c->translate("list-links--sort-recent"),
+        href  => $lnk,
+      }
+    );
+
+  }
+
+  return;
 }
 
 sub add_page {

@@ -32,6 +32,14 @@ sub register {
   $r->any('/recent')->to('Bookmarks#list', recent => 1);
   $r->any('/recent/:tag' => [tag => qr/\w[\w\-]*\w/])
     ->to('Bookmarks#list', recent => 1);
+  $r->any('/recent/u/:username'
+          => [ username => qr/\w{3,}/,
+             ])->to('Bookmarks#list', recent => 1);
+  $r->any('/recent/u/:username/:tag'
+          => [ username => qr/\w{3,}/,
+               tag      => qr/\w[\w-]{2,}\w/,
+             ])->to('Bookmarks#list', recent => 1);
+
 
   $r->any('/tag/:tag'=> [tag  => qr/\w[\w\-]*\w/])->to('Bookmarks#list');
   $r->any('/user/:username' => [username => qr/\w{3,}/])->to('Bookmarks#list');

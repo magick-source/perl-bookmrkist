@@ -3,7 +3,30 @@
 <script>
 var $BkVToken = '<%= csrf_token() %>';
 </script>
-<h2>Bookmarks</h2>
+
+<div class="row justify-content-between">
+  <div class="col-auto">
+    <h2>Bookmarks</h2>
+  </div>
+  <div class="col-auto ms-auto">
+% my @sorts = @{ stash('sort_links') || [] };
+% if (@sorts) {
+    <ul class="nav nav-pills">
+%   for my $sort (@sorts) {
+      <li class="nav-item">
+%     if ($sort->{href}) {
+        <a class="nav-link" href="<%= $sort->{href} %>">
+%     } else {
+        <a class="nav-link active" href="#">
+%     }
+          <%= $sort->{label} %>
+        </a>
+      </li>
+%   }
+    </ul>
+% }
+  </div>
+</div>
 
 % my $urls = stash('urls') || [];
 % my $middle = int( (scalar @$urls / 2) +.5 );

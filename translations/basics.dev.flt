@@ -24,3 +24,7 @@ button--add-link            = Add link
 
 # view url bookmarks
 page-title--view-bookmark   = View Bookmarks for '{$url_title}'
+
+# list urls
+list-links--sort-top        = Best
+list-links--sort-recent     = Recent

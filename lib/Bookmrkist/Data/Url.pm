@@ -256,13 +256,13 @@ sub _refilter_for_user {
 sub _search_by_user {
   my ($class, $filters, $extra) = @_;
 
-  my $order = delete $extra->{order} || 'recent';
+  my $order = delete $extra->{order} || 'score';
 
   if ( $filters->{tag_id} ) {
 
     my $flts = $class->_refilter_for_user( $filters );
 
-    $extra->{ order_by } = $orders{ "bt_$order" } || $orders{ "bt_recent " };
+    $extra->{ order_by } = $orders{ "bt_$order" } || $orders{ "bt_score" };
 
     my @bkuuids = Bookmrkist::Db::BookmarkTag->search_where($flts, $extra);
     return unless @bkuuids;
@@ -272,7 +272,7 @@ sub _search_by_user {
     $filters->{uuid} = { -in => \@bkuuids };
   }
 
-  $extra->{ order_by } = $orders{ "b_$order" } || $orders{ "b_recent " };
+  $extra->{ order_by } = $orders{ "b_$order" } || $orders{ "b_score" };
   my @bookmarks = Bookmrkist::Db::Bookmark->search_where( $filters, $extra );
   return unless @bookmarks;
 
