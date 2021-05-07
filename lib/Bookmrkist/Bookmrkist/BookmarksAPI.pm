@@ -48,8 +48,10 @@ sub add_link {
           user => $c->user
         );
 
-    my $ulink = $c->url_for($url->link)->to_abs;
-    my $blink  = $c->url_for($bookmark->link)->to_abs;
+    my $ulink = $c->url_for($url->link)->to_abs->to_string;
+    $ulink =~ s{\Ahttps?:}{};
+    my $blink  = $c->url_for($bookmark->link)->to_abs->to_string;
+    $blink =~ s{\Ahttps?:}{};
     %res = (
         done    => 1,
         objects => {
