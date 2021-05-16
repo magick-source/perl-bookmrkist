@@ -11,30 +11,26 @@
       <div class="card-status-left bg-primary"></div>
 % }
       <div class="card-body">
-        <div class="row row-cards">
-          <div class="col-2 text-center">
+        <h3 class="card-title"><%= $book->title %></h3>
+        <div class="text-muted"><%= $book->comment %></div>
+      </div>
+      <div class="card-footer">
+        <div class="row align-items-center">
+          <div class="col-auto pb-1">
 % my $user = $book->user; my $color = $user->icon_color || 'bg-blue';
 % unless ( $user->is_anonymous ) {
             <a href="<%= url_for( $user->link ) %>" >
 % }
-              <div class="avatar avatar-lg rounded <%= $color %>">
+              <span class="avatar avatar-sm rounded <%= $color %>">
                 <i  class="<%= $user->icon %>"
                     data-bs-toggle="tooltip" data-bs-placement="top"
                     title="<%= $user->display_name %>"></i>
-              </div>
+              </span>
 % unless ( $user->is_anonymous ) {
-              <h3 class="m-0 mb-1"><%= $user->display_name %></h3> 
+              <b><%= $user->display_name %></b>
             </a>
 % } 
           </div>
-          <div class="col">
-            <h3 class="card-title"><%= $book->title %></h3>
-            <p><%= $book->comment %></p>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="row align-items-center">
           <div class="col-auto">
 % for my $tag (@{ $book->tags }) {
             <a href="<%= url_for($tag->link) %>" class="badge <%= $tag->color %>"><%= $tag->label %></a>
