@@ -19,6 +19,20 @@ $(document).ready(function () {
     e.preventDefault();
     cast_vote( this, 'spam' );
   });
+
+  $('.login_to_vote').click(function (e) {
+    e.preventDefault();
+    $('#loginToast').addClass('show').removeClass('hide');
+    setTimeout(function() {
+        $('#loginToast').addClass('hide').removeClass('show');    
+      },3000)
+  });
+  $('#loginToast .btn-close').click(function() {
+    $('#loginToast').addClass('hide').removeClass('show'); 
+  });
+  $('.bookmark_vote_disable, .bookmark_voted').click(function (e) {
+    e.preventDefault();
+  });
 });
 
 function cast_vote ( vote_link, vote_type ) {

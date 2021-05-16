@@ -164,6 +164,10 @@ sub _html_body_end {
     }
   }
 
+  if ( $c->user->is_anonymous ) {
+    $res .= $c->include('inc/login_toast');
+  }
+
   return $res;
 }
 

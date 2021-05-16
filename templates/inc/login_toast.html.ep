@@ -1,0 +1,15 @@
+<div class="position-fixed swt-toast-placed">
+  <div id="loginToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-toggle="toast" data-bs-delay="3000">
+    <div class="toast-header">
+      <strong class="me-auto"><%= __('toast-login-to-vote-header') %></strong>
+      <button type="button" class="ml-auto btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      <p><%= __('toast-login-to-vote-body') %></p>
+      <p><a href="<%= url_for('/login/') %>">
+        <%= __('toast-login-to-vote-link') %>
+      </a></p>
+    </div>
+  </div>
+</div>
+

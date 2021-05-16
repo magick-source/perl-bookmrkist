@@ -28,3 +28,8 @@ page-title--view-bookmark   = View Bookmarks for '{$url_title}'
 # list urls
 list-links--sort-top        = Best
 list-links--sort-recent     = Recent
+
+# login to vote toast
+toast-login-to-vote-header  = Login to Vote
+toast-login-to-vote-body    = Only logged in users can vote.
+toast-login-to-vote-link    = Login (or create an account) here

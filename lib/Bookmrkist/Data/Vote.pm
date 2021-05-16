@@ -19,7 +19,10 @@ my @icon_order = qw(
 sub _find_icons {
   my ($self) = @_;
 
-  return [] unless $self->user and $self->user->user_id and $self->owner_id;
+  return $self->_anonymous_icons
+    unless $self->user and $self->user->user_id;
+
+  return [] unless $self->owner_id;
   
   my $state = '';
   $state = 'disabled' if $self->user->user_id == $self->owner_id;
@@ -49,6 +52,17 @@ sub _find_icons {
   my @icons = map { $icons{ $_ } ? $icons{ $_ } : () } @icon_order;
 
   return \@icons;
+}
+
+sub _anonymous_icons {
+  my ($self) = @_;
+
+  return [
+      Bookmrkist::Data::VoteIcon->new(
+          type  => 'like',
+          state => 'login-to-vote',
+        ),
+    ];
 }
 
 __PACKAGE__->make_column_accessors( );

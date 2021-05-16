@@ -44,10 +44,14 @@ sub vote_class {
     $class = 'bookmark_voted';
 
   } elsif ( $self->state eq 'disabled' ) {
-    $class = "bookmark_vote_disable";
+    $class = 'bookmark_vote_disable';
 
-  } else {
-    $class = "bookmark_to_vote";
+  } elsif ( $self->state eq 'can_vote' or $self->state eq 'voted-other' ) {
+    $class = 'bookmark_to_vote';
+
+  } elsif ( $self->state eq 'login-to-vote' ) {
+    $class = 'login_to_vote';
+
   }
   my $type = $self->type;
   $class .= " vote-type-$type";
@@ -62,6 +66,8 @@ sub color {
   my $colors = "";
   if ( $self->state eq 'disabled' or $self->state eq 'voted-other') {
     $colors = "text-muted";
+  } elsif ( $self->state eq 'login-to-vote' ) {
+    $colors = "text-azure";
   } elsif ( $self->type eq 'love' ) {
     $colors = "text-danger";
   } else {
