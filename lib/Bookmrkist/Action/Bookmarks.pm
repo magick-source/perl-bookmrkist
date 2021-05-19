@@ -1,4 +1,4 @@
-package Bookmrkist::Bookmrkist::Bookmarks;
+package Bookmrkist::Action::Bookmarks;
 
 use Mojo::Base qw(Mojolicious::Controller);
 
@@ -69,7 +69,7 @@ sub __add_sort_links {
 
   my $uname   = $filters->{username};
   my $tag     = $filters->{tag};
-  my $srecent = ($filters->{order} eq 'recent' ) ? 1 : 0;
+  my $srecent = ($filters->{order}||'' eq 'recent' ) ? 1 : 0;
 
   my @sorts;
   $c->stash->{sort_links} = \@sorts;

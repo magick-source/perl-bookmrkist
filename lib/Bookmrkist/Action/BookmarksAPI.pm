@@ -1,4 +1,4 @@
-package Bookmrkist::Bookmrkist::BookmarksAPI;
+package Bookmrkist::Action::BookmarksAPI;
 
 use Mojo::Base qw(Mojolicious::Controller);
 

@@ -7,15 +7,10 @@ sub register {
 
   $app->hook( user_has_right => \&_user_has_right );
 
-  return;
-}
-
-
-sub post_register {
-  my ($class, $app) = @_;
-
   $app->add_user_helper( score => \&user_score );
   $app->add_user_helper( vote_score => sub { vote_score( $app, @_) });
+
+  return;
 }
 
 sub user_score {

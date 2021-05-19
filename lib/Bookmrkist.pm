@@ -1,6 +1,6 @@
-package Bookmrkist::Bookmrkist;
+package Bookmrkist;
 
-use Mojo::Base qw(Mojolicious::Plugin);
+use Mojo::Base qw(SorWeTo::Server);
 
 use Bookmrkist::Db;
 use Bookmrkist::User;
@@ -10,23 +10,66 @@ use Bookmrkist::Data::Tag;
 use Bookmrkist::Data::User;
 
 has _current_config => 'xxx';
-has 'app';
 has shared_users => 0;
 
-sub register {
-  my ($self, $app, $conf) = @_;
+sub startup {
+  my ($self) = @_;
 
-  $self->app($app);
+  $self->SUPER::startup;
+
+  $self->load_plugin('email');
+  $self->load_plugin('TmpBlob');
+  $self->load_plugin('user');
+  $self->load_plugin('login');
+  $self->load_plugin('MySQL');
+  $self->load_plugin('themes');
+  $self->load_plugin('MoreHelpers');
+  $self->load_plugin('UserSettings');
+  $self->load_plugin('CookieConsent');
+
+  my $conf = $self->config->config('bookmrkist');
+
   $self->shared_users(1) if ($conf->{shared_users});
   
-  $app->defaults->{'footer-text'} = 'Built with Bookmrkist';
+  $self->defaults->{'footer-text'} = 'Built with Bookmrkist';
 
-  Bookmrkist::User->register( $app );
-  Bookmrkist::Scoring->register( $app );
+  Bookmrkist::User->register( $self );
+  Bookmrkist::Scoring->register( $self );
+
+  # no config, use same database as sorweto
+  if ( my $config = $self->config->config('mysql:bookmrkist') ) {
+    if (keys %$config) {
+      Bookmrkist::Db->init( $config );
+    }
+  }
+
+  $self->register_routes;
+
+  $self->register_themes;
+
+  $self->helper( needed_js   => \&_needed_js );
+  $self->helper( needed_css  => \&_needed_css );
+  $self->helper( global_top_tags => \&_global_top_tags );
+  $self->helper( bk_user => \&_get_bk_user );
+  $self->html_hook(html_body_end => \&_html_body_end );
+  $self->html_hook(html_head     => \&_html_head );
+
+  $self->register_static;
+
+  $self->register_themes('bookmrkist');
+  $self->register_translations('translations', { application => 'bookmrkist' });
+
+  $self->register_user_setting({ name => 'user_score', is_number => 1});
+
+  return $self;
+}
+
+sub register_routes {
+  my ($self) = @_;
 
   # Routes and stuff 
-  my $r = $app->routes;
-  unshift @{$r->namespaces}, 'Bookmrkist::Bookmrkist';
+  my $r = $self->routes;
+  unshift @{$r->namespaces}, 'Bookmrkist::Action';
 
   $r->any('/')->to('Bookmarks#list');
   $r->any('/recent')->to('Bookmarks#list', recent => 1);
@@ -62,58 +105,11 @@ sub register {
   $user_api->any('/add-link')->to('BookmarksAPI#add_link');
   $user_api->post('/vote')->to('BookmarksAPI#vote');
 
-  # to make multi-site work
-  $app->hook(around_action  => sub { $self->_around_action( @_ ) });
-
-  $app->helper( needed_js   => \&_needed_js );
-  $app->helper( needed_css  => \&_needed_css );
-  $app->helper( global_top_tags => \&_global_top_tags );
-  $app->helper( bk_user => \&_get_bk_user );
-  $app->html_hook(html_body_end => \&_html_body_end );
-  $app->html_hook(html_head     => \&_html_head );
-
-  return $self;
-}
-
-sub post_register {
-  my ($self, $app) = @_;	
-
-  Bookmrkist::User->post_register( $app );
-
-  $app->register_themes('bookmrkist');
-  $app->register_translations('translations', { application => 'bookmrkist' });
-
-  $app->register_user_setting({ name => 'user_score', is_number => 1});
+  return;
 }
 
 sub _around_action {
   my ($self, $next, $c, $action, $last) = @_;
-
-  my $hostname = $c->req->url->base->host;
-
-  $hostname =~ s{[^\w\.]}{-}g;
-  unless ($self->_current_config eq "mysql:$hostname") {
-    my $app = $self->app;
-    my $dbinfo = $app->config->config("mysql:$hostname");
-    if ($dbinfo and keys %$dbinfo) {
-      Bookmrkist::Db->init( $dbinfo );
-      unless ($self->shared_users) {
-        SorWeTo::Db->init( $dbinfo );
-      }
-      
-      $self->_current_config("mysql:$hostname");
-    } elsif ($self->_current_config ne '') {
-      $dbinfo = $app->config->config('mysql');
-      Bookmrkist::Db->init( $dbinfo );
-      unless ($self->shared_users) {
-        SorWeTo::Db->init( $dbinfo );
-      }
-      
-      $self->_current_config('');
-    }
-
-    print STDERR "user score: ", $c->user->score(), "\n\n";
-  }
 
   $c->needed_css('/css/bookmrkist.css');
 
