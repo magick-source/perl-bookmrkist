@@ -4,6 +4,8 @@
 var $BkVToken = '<%= csrf_token() %>';
 </script>
 
+%= include_maybe 'inc/before_lists';
+
 <div class="row justify-content-between">
   <div class="col-auto">
     <h2>Bookmarks</h2>
