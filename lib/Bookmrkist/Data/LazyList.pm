@@ -47,9 +47,7 @@ sub _load_data {
   my $db_class    = $self->db_class || $data_class->db_class;
 
   my $search = $self->_search;
-  use Data::Dumper;
-  print STDERR "lazylist search: ", Dumper($search);
-  
+
   my @records = $db_class->search_where( $self->_search );
 
   if ( $data_class ) {
@@ -58,7 +56,7 @@ sub _load_data {
 
   my $kfield = $self->key_field || 'id';
   my %records = map {
-      $_->$kfield() => $_ 
+      $_->$kfield() => $_
     } @records;
 
   if ( $self->can('data_loaded') ) {
