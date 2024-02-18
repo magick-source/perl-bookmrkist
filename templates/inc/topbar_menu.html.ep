@@ -14,7 +14,7 @@
 
 % } elsif (!$user or $user->is_anonymous) {
   <div class="nav-item mr-3">
-    <a href="<%= url_for('/login/') %>" class="nav-link px-0" data-toogle=tooltip" title="<%= __('topmenu-login-tooltip') %>">
+    <a href="<%= url_for('/login/') %>" class="nav-link px-0" data-toogle="tooltip" title="<%= __('topmenu-login-tooltip') %>">
       <i class="far fa-user"></i>
     </a>
   <div>
